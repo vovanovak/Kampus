@@ -1,0 +1,46 @@
+﻿@{
+    ViewBag.Title = "SignIn";
+}
+
+<html>
+<head>
+    <link rel="SHORTCUT ICON" href="~/Images/favicon.png" type="image/x-icon"/> <title>Вхід</title>
+
+    @Scripts.Render("~/bundles/jquery")
+
+    <link rel="stylesheet" href="../../Content/null_style.css" />
+    <link rel="stylesheet" href="../../Content/signin_style.css"/>
+
+    <script type="text/javascript" src="~/Scripts/My/signin.js"></script>
+</head>
+<body>
+
+
+<div id="main">
+    <div>
+        <img id="mainbiglogo" src="../../Images/logo_blue.png" width="500"/>
+    </div>
+    <div id="mainsubheader">
+        <span>студентська спільнота</span>
+    </div>
+    <div id="mainform">
+        <div>
+            <input type="text" id="inputSignInUsername" class="inputSignIn" placeholder="Логін"/>
+        </div>
+
+        <div>
+            <input type="password" id="inputSignInPassword" class="inputSignIn" placeholder="Пароль"/>
+        </div>
+
+        <div id="recoverpassword">
+            <a id="recoverpasswordlnk" href="@Url.Action("PasswordRecovery", "Settings")">Відновити пароль</a>
+        </div>
+
+        <div id="inputSignInBtn">
+            Увійти
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

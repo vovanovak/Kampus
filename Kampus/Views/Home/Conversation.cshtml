@@ -1,0 +1,389 @@
+﻿@using Kampus.Models
+@using Microsoft.Ajax.Utilities
+
+@{
+    Layout = null;
+}
+@Scripts.Render("~/bundles/jquery")
+@{
+    var firstmes = (List<MessageModel>)ViewBag.FirstMessages;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link rel="SHORTCUT ICON" href="~/Images/favicon.png" type="image/x-icon"/> <title>Повідомлення</title>
+    <link rel="stylesheet" href="../../Content/null_style.css" />
+    <link rel="stylesheet" href="../../Content/messages_style.css"/>
+    <link rel="stylesheet" href="../../Content/notifications_style.css"/>
+    <link rel="stylesheet" href="~/Content/toolbar_style.css" />
+    <link rel="stylesheet" href="~/Content/attach_style.css" />
+ 
+    <script src="~/Scripts/knockout-3.4.0.js" type="text/javascript"></script>
+    <script src="~/Scripts/My/notification.js"></script>
+
+    <script type="text/javascript">
+    var _attachments = new Array();
+    var koViewModel;
+    $(document).ready(function () {
+        function ViewModel(messages, attach, images) {
+            self = this;
+            self.newMessages = ko.observableArray(messages);
+            self.attachments = ko.observableArray(attach);
+            self.attachmentsImages = ko.observableArray(images);
+            
+            self.addChild = function (obj) {
+                self.newMessages.push(obj);
+            };
+            self.addNewAttachment = function (obj) {
+                self.attachments.push(obj);
+            };
+            self.addNewAttachImage = function (obj) {
+                self.attachmentsImages.push(obj);
+            }
+            self.clearAttachments = function () {
+                self.attachments = [];
+            }
+            self.clearAttachImages = function () {
+                self.attachmentsImages = [];
+            }
+            koViewModel = self;
+        }
+        
+        $('#toolbar').css("position", "fixed");
+        $('#toolbar').css("z-index", "1000");
+
+        $("#maininputmsgfilesin").change(function () {
+            _attachments.push($("#maininputmsgfilesin").val());
+        });
+
+        $('#aside').height($('#mainmessages').height() + 50);
+        $('#aside').css("background", "#e7e7e7");
+
+        $(window).resize(function () {
+            $('#aside').height($('#mainmessages').height() + 50);
+            $('#aside').css("background", "#e7e7e7");
+        });
+
+        $(".maininputaddfile").click(function () {
+            $("#maininputmsgfilesin").trigger("click");
+        });
+
+        $(".maininputaddphoto").click(function () {
+            $("#maininputmsgfilesin").trigger("click");
+        });
+
+        $('html, body').scrollTop($(document).height());
+
+        notifications_init();
+        $.ajax('@Url.Content("~/Templates/message.html")', { async: false })
+            .success(function (stream) {
+                $('#templateMessages').html(stream);
+            }
+        );
+
+        $.ajax('@Url.Content("~/Templates/attachment_file.html")', { async: false })
+           .success(function (stream) {
+               $('#templateAttachments').html(stream);
+           }
+       );
+
+        $.ajax('@Url.Content("~/Templates/attachment_image.html")', { async: false })
+          .success(function (stream) {
+              $('#templateImages').html(stream);
+          }
+        );
+
+        ko.applyBindings(new ViewModel([], [], []));
+
+        $("#maininputmsgfilesin").change(function () {
+            var _formData = new FormData();
+            var files = $("#maininputmsgfilesin").get(0).files;
+            for (var i = 0; i < files.length; i++) {
+                _formData.append("FileUpload", files[i]);
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("UploadFileMessage", "Home")',
+                data: _formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function () {
+                    var fileName = files[files.length - 1].name;
+                    var lastIndexOfDot = fileName.lastIndexOf('.');
+                    var extension = fileName.slice(lastIndexOfDot, fileName.length);
+
+                    if (extension.localeCompare('.jpg') == 0) {
+                        koViewModel.addNewAttachImage({ FileName: files[files.length - 1].name, Path: URL.createObjectURL(files[files.length - 1]).toLocaleString() });
+                    }
+                    else {
+                        koViewModel.addNewAttachment({ FileName: files[files.length - 1].name, Path: URL.createObjectURL(files[files.length - 1]).toLocaleString() });
+                        console.log(files[files.length - 1].name);
+                    }
+                },
+                error: function (error) {
+                    alert("Error while uploading file!");
+                }
+            });
+
+        });
+
+
+
+        $('.maininputmsgcontentsend').click(function () {
+            var _receiver = $('#receiverid').val();
+            var _text = $('.maininputmsgcontentinput').val();
+
+            $.post('@Url.Action("WriteMessage")', { userid: _receiver, text: _text }, function (json) {
+                var data = JSON.parse(json);
+                console.log(data);
+                koViewModel.addChild(data);
+                koViewModel.clearAttachments();
+                koViewModel.clearAttachImages();
+                $('.maininputmsgcontentinput').val("");
+                $('.maininputmsg').find('.filerefcont').remove();
+                $('.maininputmsg').find('.maininputmsgimages').children().remove();
+                console.log(data.Username);
+                var links = $('.asideuserdetails').find('a');
+                for (var i = 0; i < links.length; i++) {
+                    console.log(links[i].text);
+                    if (links[i].text == data.Receiver) {
+                        $(links[i]).parents('.asideuserdetails').find('.asideusermessage').text(data.Content);
+                    }
+                }
+            });
+        });
+
+
+
+        setInterval(function () {
+
+            var sender = $('#senderid').val();
+            var receiver = $('#receiverid').val();
+            var lstmsgid = $('.messageid').last().val();
+
+
+            $.get('@Url.Action("GetNewMessages", "Home")',
+                {
+                    senderid: sender,
+                    receiverid: receiver,
+                    lastmsgid: lstmsgid
+                }).done(function (json) {
+
+                    var data = JSON.parse(json);
+
+                    for (var i = 0; i < data.length; i++) {
+                        if (lstmsgid != data[i].Id) {
+                            koViewModel.addChild(data[i]);
+                        }
+                    }
+                    $('#aside').height($('#mainmessages').height() + 50);
+                    $('#aside').css("background", "#e7e7e7");
+                });
+        }, 3000);
+    });
+    </script>
+</head>
+<body>
+<div>
+    @Html.Partial("Toolbar")
+
+    <div id="wrapper">
+        <div id="aside">
+            <div id="asideusers">
+                @if (ViewBag.Messangers != null)
+                {
+                     foreach (var user in ViewBag.Messangers)
+                     {
+                         <div class="asideuser">
+                             <div class="asideuseravatar">
+                                 <img class="mainavatarimg" src="@user.Avatar"/>
+                             </div>
+                             <div class="asideuserdetails">
+                                 @if (ViewBag.SecondUser == user.Username)
+                                 {
+                                     <div class="asideusername">
+                                         <a href="/Home/Conversation?username=@user.Username" style="text-decoration: underline">@user.Username</a>
+                                     </div>
+                                 }
+                                 else
+                                 {
+                                     <div class="asideusername">
+                                         <a href="/Home/Conversation?username=@user.Username" style="text-decoration: none">@user.Username</a>
+                                     </div>
+                                 }
+                                 <div class="asideusermessage">
+                                     @if (firstmes.Any(m => m != null))
+                                     {
+                                         if (firstmes[ViewBag.Messangers.IndexOf(user)].Content.Length > 101)
+                                         {
+                                             @firstmes[ViewBag.Messangers.IndexOf(user)].Content.Substring(0, 100)
+                                         }
+                                         else
+                                         {
+                                             @firstmes[ViewBag.Messangers.IndexOf(user)].Content
+                                         }
+                                     }
+                                 </div>
+                             </div>
+                         </div>
+                     }
+                }
+            </div>
+        </div>
+        <div id="main">
+            <div id="mainmessages">
+                <div id="receivedmessages">
+                    @if (ViewBag.Messages != null)
+                    {
+                        foreach (MessageModel message in ViewBag.Messages)
+                        {
+                            if (message.Sender.Id == ViewBag.CurrentUser.Id)
+                            {
+                                <div class="mainsendermsg">
+                                    <div class="mainsenderavatar">
+                                        <div class="mainmsgavatarst">
+                                            <img class="mainavatarimg" src="@((message.Sender.Avatar == null) ?
+                                         "http://www.redmangrove.com/blog/wp-content/uploads/2014/10/question-mark-xxl.png"
+                                         : @message.Sender.Avatar )" width="50" />
+                                        </div>
+                                    </div>
+                                    <div class="mainsendermsgcontent">
+                                        @if (message.Attachments.Count > 0)
+                                        {
+                                            if (message.Attachments.Any(m => m.IsImage))
+                                            {
+                                                <div class="mainsendermsgimages">
+
+                                                    @foreach (var image in message.Attachments.Where(m => m.IsImage))
+                                                    {
+
+                                                        <img width="400" src="/Files/@image.RealFileName" />
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                        <div class="mainsendermsgcontenttext">
+                                            @message.Content
+                                        </div>
+                                        @if (message.Attachments.Count > 0)
+                                        {
+                                            if (message.Attachments.Any(m => !m.IsImage))
+                                            {
+                                                <div class="filerefs">
+                                                    @foreach (var link in message.Attachments.Where(m => !m.IsImage))
+                                                    {
+                                                        <div class="filerefcont">
+                                                            <img src="~/Images/round/attachment.png" /> @Html.ActionLink(link.FileName, "Download", "Download", new { path = link.RealFileName, fileName = link.FileName }, new { @class = "fileref" })
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+
+                                    <div class="mainsendermsgtriangle"></div>
+                                    <div class="mainsendermsgusername"><a class="mainsendermsgusernamelnk" href="@Url.Action("Id", "Profile", new {id=message.Sender.Id})">@@@message.Sender.Username</a></div>
+                                    <input type="hidden" value="@message.Id" class="messageid" name="messageid" />
+                                </div>
+                            }
+                            else
+                            {
+
+                                <div class="mainreceivermsg">
+
+                                    <div class="mainreceiveravatar">
+                                        <div class="mainmsgavatarst">
+                                            <img class="mainavatarimg" src="@((message.Sender.Avatar == null) ? "http://www.redmangrove.com/blog/wp-content/uploads/2014/10/question-mark-xxl.png" : @message.Sender.Avatar )" width="50" />
+                                        </div>
+                                    </div>
+                                    <div class="mainreceivermsgcontent">
+                                        @if (message.Attachments.Count > 0)
+                                        {
+                                            if (message.Attachments.Any(m => m.IsImage))
+                                            {
+                                                <div class="mainreceivermsgimages">
+
+                                                    @foreach (var image in message.Attachments.Where(m => m.IsImage))
+                                                    {
+                                                        <img width="400" src="/Files/@image.RealFileName" />
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                        <div class="mainreceivermsgcontenttext">
+                                            @message.Content
+                                        </div>
+                                        @if (message.Attachments.Count > 0)
+                                        {
+                                            if (message.Attachments.Any(m => !m.IsImage))
+                                            {
+                                                <div class="filerefs">
+                                                    @foreach (var link in message.Attachments.Where(m => !m.IsImage))
+                                                    {
+                                                        <div class="filerefcont">
+                                                            <img src="~/Images/round/attachment.png" /> @Html.ActionLink(link.FileName, "Download", "Download", new { path = link.RealFileName, fileName = link.FileName }, new { @class = "fileref" })
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+
+                                    <div class="mainreceivermsgtriangle"></div>
+                                    <div class="mainreceivermsgusername"><a class="mainreceivermsgusernamelnk" href="@Url.Action("Id", "Profile", new {id=message.Sender.Id})">@@@message.Sender.Username</a></div>
+                                    <input type="hidden" value="@message.Id" class="messageid" name="messageid" />
+
+                                </div>
+
+                            }
+                        }
+
+                    }
+                    <div id="templateMessages"></div>
+                    <div id="templateAttachments"></div>
+                    <div id="templateImages"></div>
+                    <div data-bind="template: { name: 'message-template', foreach: newMessages }">
+
+                    </div>
+                </div>
+
+                <div>
+                    <div class="maininputmsg">
+                        @if (ViewBag.UserProfile.Id != -1)
+                        {
+                            <div class="maininputmsgcontent">
+                                <div class="maininputmsgimages" data-bind="template: { name: 'attachment-image' , foreach: attachmentsImages }">
+
+                                </div>
+                                <textarea name="text" class="maininputmsgcontentinput"></textarea>
+                                
+                                <div class="filerefs" data-bind="template: { name: 'attachment-file', foreach: attachments }">
+
+                                </div>
+                                
+                                <input type="submit" value="Відправити" class="maininputmsgcontentsend" />
+                                <img class="maininputaddfile" src="~/Images/add_file.png" />
+                                <img class="maininputaddphoto" src="~/Images/add_photo.png" />
+                                <input id="maininputmsgfilesin"
+                                        type="file" name="file" multiple />
+                            </div>
+                            <div class="maininputmsgtriangle"></div>
+
+                            <input type="hidden" value="@ViewBag.UserProfile.Id" name="userid" />                 
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <input type="hidden" value="@ViewBag.CurrentUser.Id" id="senderid"/>
+    <input type="hidden" value="@ViewBag.UserProfile.Id" id="receiverid"/>
+</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+﻿<script type="text/html" id="wallpost-comment">
+    <div class="postcomment">
+        <div class="postcommentcontent">
+            <div class="postcommentcontenttext" data-bind="text: Comments.Content">
+                
+            </div>
+        </div>
+        <div class="postcommenttriangle"></div>
+        <div class="postcommentcreator" data-bind="text: '@' +  Comments.User.Username"></div>
+        <div>
+            <input class="postcommentid" type="hidden" data-bind="attr: {value:  Comments.Id}" />
+        </div>
+    </div>
+</script>

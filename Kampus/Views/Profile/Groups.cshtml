@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Groups";
+}
+
+<h2>Groups</h2>
+
+@foreach (var group in ViewBag.UserProfile.Groups)
+{
+    <div>
+
+        <div>Group name: <a href="@Url.Action("Index", "Group", new  { groupid = group.Id })">@group.Name</a>  </div>
+        <div>Group status: @group.Status </div>
+        <div>Group avatar: @group.Avatar </div>
+    </div>
+
+    <div>-------------------------------------------------------</div>
+}

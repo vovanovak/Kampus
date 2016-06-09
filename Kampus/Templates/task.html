@@ -1,0 +1,111 @@
+﻿<script type="text/html" id="task-template">
+    <div class="task">
+        <div class="taskheader">
+            <div class="taskheadercontent">
+                <div class="taskcat"><span class="catSym">@</span> <span class="taskcategory" data-bind="text: CategoryName">  </span> 
+                <span class="catSym">@</span><span class="taskcategory" data-bind="text: SubcategoryName"></span></div>
+
+                <div class="taskprice" data-bind="text: Price + ' грн.'"></div>
+
+                <div>
+                    <a class="taskheadercontenttext" data-bind="text: Header, attr: { class: 'taskheadercontenttext', url: '/Tasks/Id/' + Id}"></a>
+                </div>
+            </div>
+        </div>
+        <div class="taskcommentshid">
+            <div class="taskimages" data-bind="if: Images.length > 0">
+                <div data-bind="foreach: Images">
+                    <img class="attachImg" data-bind="attr: {src: '/Files/' + RealFileName  }" />
+                </div>
+            </div>
+            
+            <div class="taskcontent" data-bind="text: Content"></div>
+            <div data-bind="if: Files.length > 0">
+                <div class="filerefs" data-bind="foreach: Files">
+
+                    <div class="filerefcont">
+                        <img src="../../Images/round/attachment.png" /> <a data-bind="text: FileName, attr: { href: '/Files/' + RealFileName, class: 'fileref' }"> </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="tasksubscribers"> <!--data-bind="if: Subscribers.length > 0"-->
+                <span class="tasksubscribersheader" data-bind="if: Subscribers.length > 0">Підписники </span>
+                <div data-bind="foreach: Subscribers">
+                    
+                    <div class="tasksubscriber">
+                        <a style="text-decoration: none;" data-bind="attr: { href: '/Profile/Id/' + User.Id }"><span class="tasksubscribersuser" data-bind="text: User.Usernname + ' @@' + Price"></span></a>
+                        
+                        <img data-bind="if: Executive == null" title="Поставити виконавцем" class="checkasmainexecutive" src="../Images/yes.png"/>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="taskexecutive" data-bind="if: Executive != null">
+                <span class="tasksubscribersheader">Виконавець: </span>
+                <div>
+                    <a style="text-decoration: none;" data-bind="attr: { href: '/Profile/Id/' + Executive.Id }"><span class="tasksubscribersuser" data-bind="text: '@' + Executive.Username"></span></a>
+                    <img title="Видалити виконавця" class="uncheckasmainexecutive" src="../Images/remove.png"/>
+                </div>
+            </div>
+            
+            <div class="taskcommentscontent">
+                <div class="taskcommentscontentc">
+                    <!--<div data-bind="if: Comments.length > 0">-->
+                    <div data-bind="foreach: Comments">
+                    <div class="taskcomment">
+                            <div class="taskcommentcontent">
+                                <div class="taskcommentcontenttext" data-bind="text: Content"></div>
+                            </div>
+                            <div class="taskcommenttriangle"></div>
+                            <div class="taskcommentcreator" data-bind="text: '@' + User.Username"></div>
+                            <div>
+                                <input class="taskcommentid" type="hidden" data-bind="attr: { value: Id }" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--</div>-->
+                    <div data-bind="foreach: koViewModel.newTaskComments">
+                        <div data-bind="if: Id == $parent.Id">
+                            <div data-bind="template: { name: 'task-comment-template'}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="maininputcomment">
+                    <div class="maininputcommentcontent">
+                        <textarea name="text" class="maininputcommentinput"></textarea>
+                        <input type="button" value="Відправити" class="maininputcommentsend" />
+                    </div>
+                    <div class="maininputcommenttriangle"></div>
+                </div>
+            </div>
+        </div>
+        <div class="tasktriangle"></div>
+        <div class="taskunder">
+            <div class="taskcreator" data-bind="text: '@' + Creator.Username"></div>
+
+            
+            <div class="tasksubscribe1" data-bind="if: Solved == true">
+                <img title="Завдання виконано" class="tasksubscribeimg" src="../../Images/solved.png" width="28" />
+            </div>
+            
+            
+            <div class="tasksubscribe" data-bind="if: Solved != true">
+                <img title="Позначити виконаним" class="tasksubscribeimg" src="../../Images/subscribe_to_task.png" width="28" />
+            </div>
+            
+
+            <div class="taskcomments">
+                <span class="taskcount" data-bind="text: Comments.length"></span> <img src="../../Images/comments.png" align="middle" width="28" />
+            </div>
+            <div class="tasklikes">
+                <span class="taskcount" data-bind="text: LikesCount"></span> <img src="../../Images/like.png" width="28" />
+            </div>
+
+        </div>
+        <input type="hidden" class="taskid" data-bind="attr: { value: Id }" />
+    </div>
+</script>

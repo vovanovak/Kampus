@@ -1,0 +1,538 @@
+﻿@using Kampus.Models
+@{
+    ViewBag.Title = "Tasks";
+}
+@{
+    ViewBag.Title = "Tasks";
+    List<TaskModel> tasks = ViewBag.Tasks;
+    UserModel user = ViewBag.CurrentUser;
+    SearchTaskModel search = ViewBag.SearchTask;
+}
+
+<html>
+<head>
+    <link rel="SHORTCUT ICON" href="~/Images/favicon.png" type="image/x-icon"/> <title>Завдання</title>
+
+    <link rel="stylesheet" href="../../Content/null_style.css" />
+    <link rel="stylesheet" href="~/Content/attach_style.css" />
+    <link rel="stylesheet" href="../../Content/tasks_style.css" />
+    <link rel="stylesheet" href="../../Content/notifications_style.css"/>
+    <link rel="stylesheet" href="~/Content/toolbar_style.css" />
+
+
+    @Scripts.Render("~/bundles/jquery")
+    
+    <script src="~/Scripts/knockout-3.4.0.js"></script>
+    <script src="~/Scripts/My/notification.js"></script>
+    <script>
+    //function resizeAside() {
+    //    if ($('#aside').height() < $('#main').height() + 50) {
+    //        $('#aside').height($('#main').height() + 50);
+    //        $('#aside').css("background", "#e7e7e7");
+    //    }
+    //}
+
+
+    $(document).ready(function () {
+        function ViewModel(tasks, comments, subscribers, attach, images) {
+            self = this;
+            self.newTasks = ko.observableArray(tasks);
+            self.newTaskComments = ko.observableArray(comments);
+            self.taskSubscribers = ko.observableArray(subscribers);
+            self.attachments = ko.observableArray(attach);
+            self.attachmentsImages = ko.observableArray(images);
+
+            self.getTaskComments = function (Id) {
+                console.log(Id);
+                console.log(ko.utils.arrayFilter(koViewModel.newTaskComments(), function (item) { return item.Id === Id }));
+                return ko.utils.arrayFilter(koViewModel.newTaskComments(), function (item) { return item.Id === Id }).Comments;
+            }
+            self.getTaskExecutive = function (Id) {
+                console.log(Id);
+                console.log(ko.utils.arrayFilter(koViewModel.taskExecutives(), function (item) { return item.Id === Id }));
+                return ko.utils.arrayFilter(koViewModel.taskExecutives(), function (item) { return item.Id === Id }).Executive;
+            }
+
+            self.addChild = function (obj) {
+                self.newTasks.unshift(obj);
+            };
+            self.addNewAttachment = function (obj) {
+                self.attachments.push(obj);
+            };
+            self.addNewAttachImage = function (obj) {
+                self.attachmentsImages.push(obj);
+            }
+            self.addNewTaskComment = function (obj) {
+                self.newTaskComments.push(obj);
+                console.log(self.newTaskComments());
+            }
+            self.addTaskSubscriber = function (obj) {
+                self.taskSubscribers.push(obj);
+                console.log(self.taskSubscribers());
+            }
+
+            self.clearAttachments = function () {
+                self.attachments = [];
+            }
+            self.clearAttachImages = function () {
+                self.attachmentsImages = [];
+            }
+            koViewModel = self;
+        }
+
+        $.ajax('@Url.Content("~/Templates/task.html")', { async: false })
+            .success(function (stream) {
+                $('#templateTask').html(stream);
+            }
+        );
+
+        $.ajax('@Url.Content("~/Templates/task_comment.html")', { async: false })
+            .success(function (stream) {
+                $('#templateTaskComment').html(stream);
+            }
+        );
+        $.ajax('@Url.Content("~/Templates/task_subscriber.html")', { async: false })
+           .success(function (stream) {
+               $('#templateSubscriber').html(stream);
+           }
+       );
+        $.ajax('@Url.Content("~/Templates/attachment_file.html")', { async: false })
+           .success(function (stream) {
+               $('#templateAttachments').html(stream);
+           }
+       );
+
+        $.ajax('@Url.Content("~/Templates/attachment_image.html")', { async: false })
+          .success(function (stream) {
+              $('#templateImages').html(stream);
+          }
+        );
+        koViewModel = new ViewModel([], [], [], [], []);
+        ko.applyBindings(koViewModel);
+
+
+        if ($('#aside').height() < $('#main').height() + 50) {
+            $('#aside').height($('#main').height() + 50);
+            $('#aside').css("background", "#e7e7e7");
+        }
+
+        $(window).resize(function () {
+           
+        });
+
+        $("#maincreateheader").click(function () {
+            $("#maininputmsg").slideToggle("slow");
+           
+        });
+
+        $("#nextstep").click(function () {
+
+        });
+
+        $(document.body).on('click', '.taskcomments', function () {
+            $(this).parents('.task').children('.taskcommentshid').slideToggle("slow", function () { });
+            var postthis = $(this);
+            var count = $(this).parents('.task').find('.taskcount')[0];
+            var appenddiv = $(this).parents('.task').find('.taskcommentscontentc')[0];
+
+            setInterval(function () {
+                var _postid = postthis.parents('.task').find('.taskid').val();
+                var _postcommentid = postthis.parents('.task').find('.taskcommentid:last').val();
+
+                $.get('@Url.Action("GetNewTaskComments", "Home")', { taskid: _postid, taskcommentid: _postcommentid }).done(function (data) {
+                    var list = JSON.parse(data);
+
+                    if (list.length > 0) {
+                        for (var i = 0; i < list.length; i++) {
+                            koViewModel.addNewTaskComment({ Id: _postid, Comments: list[i] });
+                        }
+
+                        var value = parseInt($(count).text());
+
+                        $(count).text(value + list.length);
+                    }
+                });
+            }, 3000);
+
+           
+        });
+
+        $(document.body).on('click', '.tasksubscribeimg', function () {
+            var str = parseInt(window.prompt("Введіть ціну"), 10);
+            //alert(isNaN(str));
+            var _taskid = $(this).parents('.task').find('.taskid').val();
+            var postthis = $(this);
+            if (!isNaN(str) || !str.localeCompare("")) {
+
+                $.post('@Url.Action("SubscribeOnTask", "Profile")', { taskid: _taskid, taskprice: str }, function (data) {
+                    var val = JSON.parse(data);
+                    if (val.Id == -1) {
+                        alert("Ви не можете підписатись на це завдання");
+                    }
+                    else {
+                        alert("Ви успішно підписались");
+
+                        if (postthis.parents('.task').find('.tasksubscribers').children().length == 0) {
+                            postthis.parents('.task').find('.tasksubscribers').append("<span class='tasksubscribersheader'>Підписники </span>");
+                        }
+
+                        koViewModel.addTaskSubscriber({ Id: _taskid, Subscriber: val });
+                        postthis.parents('.tasksubscribe').attr('class', 'tasksubscribe1');
+                        postthis.attr('src', '../../Images/solved.png');
+                    }
+                });
+
+            }
+            else {
+
+            }
+        });
+
+        $(document.body).on('click', '.tasklikes', function () {
+            var val1 = $(this).parents(".task").find('.taskid')[0].value;
+            var postthis = $(this);
+            $.post('@Url.Action("LikeTask", "Profile")', { taskid: val1 }, function (data) {
+                var count = parseInt(postthis.children().first().text());
+
+                if (data == 0)
+                    postthis.children().first().text(count - 1);
+                else {
+                    postthis.children().first().text(count + 1);
+                }
+            });
+        });
+
+        $(document.body).on('click', '.maininputcommentsend', function () {
+            var val1 = $(this).parents('.task').find('.taskid')[0].value;
+            var text1 = $(this).parent().children('.maininputcommentinput').val();
+            var count = $(this).parents('.task').find('.taskcount')[0];
+            var postthis = $(this);
+
+            $.post('@Url.Action("WriteTaskComment", "Profile")', { taskid: val1, text: text1 }, function (data) {
+                console.log({ Id: val1, Comments: JSON.parse(data) });
+
+                for (var i = 0; i < koViewModel.newTasks.length; i++) {
+                    if (koViewModel.newTasks[i].Id == val1) {
+                        koViewModel.newTasks[i].Comments.splice(koViewModel.newTasks[i].Comments.length - 1, 0, JSON.parse(data));
+                    }
+                }
+
+                koViewModel.addNewTaskComment({ Id: val1, Comments: JSON.parse(data) });
+
+                var value = parseInt($(count).text());
+
+                $(count).text(value + 1);
+                $(text1).text('');
+               
+            });
+        });
+
+        $('#searchcategory').find("select").change(function () {
+
+            var Name = "";
+            $(this).find("option:selected").each(function () {
+                Name = $(this).text();
+            });
+
+
+            $.get('@Url.Action("GetSubcategories", "Home")', { name: Name }).done(function (data) {
+
+                var string = "";
+
+
+                var list = JSON.parse(data);
+
+
+                for (var i = 0; i < list.length; i++) {
+                    console.log(i);
+                    console.log(list[i]);
+                    console.log(list[i].Id);
+                    console.log(list[i].Name);
+                    string += '<option value="' + list[i].Id + '">' + list[i].Name + '</option>';
+                }
+
+                string += '<option value=""></option>';
+
+                console.log(string);
+
+                $('#searchsubcategory').find("select").html(string);
+            });
+
+        });
+        $("#Category").change(function () {
+
+            var Name = "";
+            $("#Category option:selected").each(function () {
+                Name = $(this).text();
+            });
+
+
+            $.get('@Url.Action("GetSubcategories", "Home")', { name: Name }).done(function (data) {
+
+                var string = "";
+
+                //alert(data);
+
+                var list = JSON.parse(data);
+
+
+                for (var i = 0; i < list.length; i++) {
+                    console.log(i);
+                    console.log(list[i]);
+                    console.log(list[i].Id);
+                    console.log(list[i].Name);
+                    string += '<option value="' + list[i].Id + '">' + list[i].Name + '</option>';
+                }
+
+                console.log(string);
+
+                $('#Subcategory').html(string);
+            });
+
+        });
+
+        notifications_init();
+    });
+    </script>
+</head>
+<body>
+    @Html.Partial("Toolbar")
+    <div id="wrapper">
+        <div id="aside">
+            <div id="tasksearchform">
+                @using (Html.BeginForm("SearchTasks", "Tasks", FormMethod.Get))
+                {
+
+                    <input type="text" class="inputSignIn" id="searchrequest"
+                           value="@(search.Request ?? "")" name="request" placeholder="Пошук" />
+
+                    <div class="searchheader">Категорія</div>
+                    <div class="slate" id="searchcategory" title="Категорія">
+                        <select name="category">
+                            <option value="-1"></option>
+                            @if (search.CategoryId == null)
+                            {
+                                foreach (TaskCategoryModel category in ViewBag.TaskCategories)
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+                            }
+                            else
+                            {
+                                foreach (TaskCategoryModel category in ViewBag.TaskCategories)
+                                {
+                                    if (category.Id == search.CategoryId)
+                                    {
+                                        <option value="@category.Id" selected>@category.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="searchheader">Підкатегорія</div>
+                    <div class="slate" id="searchsubcategory" title="Підкатегорія">
+                        <select name="subcategory">
+                            <option value="-1"></option>
+                            @if (search.SubcategoryId == null)
+                            {
+                                foreach (TaskSubcatModel category in ViewBag.TaskSubcategories)
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+                            }
+                            else
+                            {
+                                foreach (TaskSubcatModel category in ViewBag.TaskSubcategories)
+                                {
+                                    if (category.Id == search.SubcategoryId)
+                                    {
+                                        <option value="@category.Id" selected>@category.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <a class="searchlinkbtn" href="@Url.Action("Categories", "Tasks")">
+                        <div style="margin-top: 30px;">Пошук за категоріями</div>
+                    </a>
+                    <div class="searchheader">Ціна</div>
+                    <div>
+                        <input type="number" name="minprice" class="inputSignIn"
+                               value="@(search.MinPrice == null ? "" : search.MinPrice.Value.ToString())"
+                               id="searchminprice" title="Мінімальна ціна" />
+                        <input type="number" name="maxprice" class="inputSignIn"
+                               value="@(search.MaxPrice == null ? "" : search.MaxPrice.Value.ToString())"
+                               id="searchmaxprice" title="Максимальна ціна" />
+                    </div>
+
+                    <input type="submit" class="nextstepsearch" value="Пошук" />
+                }
+            </div>
+        </div>
+
+        <div id="main">
+            <div id="mainheader">Завдання</div>
+
+            <div id="tasks">
+
+                @foreach (TaskModel taskModel in tasks)
+                {
+                    <div class="task">
+                        <div class="taskheader">
+                            <div class="taskheadercontent">
+                                <div class="taskcat"><span class="taskcategory"> <span class="catSym">@@</span>@taskModel.CategoryName </span> <span class="taskcategory"><span class="catSym">@@</span>@taskModel.SubcategoryName</span></div>
+
+                                <div class="taskprice">@(taskModel.Price != null ? taskModel.Price.ToString() + " грн." : "")</div>
+
+                                <div>
+                                    <a href="@Url.Action("Id", "Tasks", new {id = taskModel.Id})" class="taskheadercontenttext">@taskModel.Header</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="taskcommentshid">
+                            @if (taskModel.Attachments != null)
+                            {
+                                if (taskModel.Attachments.Any(p => p.IsImage))
+                                {
+                                    foreach (var image in taskModel.Attachments.Where(p => p.IsImage))
+                                    {
+                                        <img class="attachImg" src="/Files/@image.RealFileName" />
+                                    }
+                                }
+                            }
+                            <div class="taskcontent">@taskModel.Content</div>
+
+                            @if (taskModel.Attachments != null)
+                            {
+                                if (taskModel.Attachments.Any(p => !p.IsImage))
+                                {
+                                    <div class="filerefs">
+                                        @foreach (var link in taskModel.Attachments.Where(p => !p.IsImage))
+                                        {
+                                            <div class="filerefcont">
+                                                <img src="~/Images/round/attachment.png" /> @Html.ActionLink(link.FileName,
+                                                        "Download", "Download", new { path = link.RealFileName, fileName = link.FileName },
+                                                        new { @class = "fileref" })
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+
+                            <div class="tasksubscribers">
+
+                                @if (taskModel.Subscribers.Any())
+                                {
+                                    <span class="tasksubscribersheader">Підписники </span>
+                                    <div>
+                                        @foreach (var sub in taskModel.Subscribers)
+                                        {
+                                            <div class="tasksubscriber">
+                                                <a style="text-decoration: none;" href="@Url.Action("Id", "Profile", new {Id = sub.User.Id})"><span class="tasksubscribersuser">@@@sub.User.Username @(sub.Price == null || sub.Price == 0 ? "" : sub.Price.ToString() + " грн.")</span></a>
+                                                @*@if (taskModel.Executive.Id == null)
+                                                    {
+                                                        <img title="Поставити виконавцем" class="checkasmainexecutive" src="@Url.Content("../../Images/yes.png")" />
+                                                    }*@
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <div class="tasksubscribercont" data-bind="foreach: taskSubscribers">
+
+                                <div data-bind="if: Id == @taskModel.Id">
+                                    <div data-bind="template: { name: 'task-subscriber-template'}"></div>
+                                </div>
+                            </div>
+                            @if (taskModel.Executive != null)
+                            {
+                                <div class="taskexecutive">
+                                    <span class="tasksubscribersheader">Виконавець: </span>
+                                    <div>
+                                        <a style="text-decoration: none;" href="@Url.Action("Id", "Profile", new {Id = taskModel.Executive.Id})"><span class="tasksubscribersuser">@@@taskModel.Executive.Username </span></a>
+                                        @*<img title="Видалити виконавця" class="uncheckasmainexecutive" src="@Url.Content("../../Images/remove.png")" />*@
+                                    </div>
+                                </div>
+                            }
+                            <div class="taskcommentscontent">
+                                <div class="taskcommentscontentc">
+                                    @if (taskModel.Comments.Count > 0)
+                                    {
+                                        foreach (var comment in taskModel.Comments)
+                                        {
+                                            <div class="taskcomment">
+                                                <div class="taskcommentcontent">
+                                                    <div class="taskcommentcontenttext">
+                                                        @comment.Content
+                                                    </div>
+                                                </div>
+                                                <div class="taskcommenttriangle"></div>
+                                                <div class="taskcommentcreator">@@@comment.User.Username</div>
+                                                <div>
+                                                    <input class="taskcommentid" type="hidden" value="@comment.Id" />
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    <div data-bind="foreach: newTaskComments">
+                                        <div data-bind="if: Id == @taskModel.Id">
+                                            <div data-bind="template: { name: 'task-comment-template'}"></div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="maininputcomment">
+                                    <div class="maininputcommentcontent">
+                                        <textarea type="text" name="text" class="maininputcommentinput"></textarea>
+                                        <input type="button" value="Відправити" class="maininputcommentsend" />
+                                    </div>
+                                    <div class="maininputcommenttriangle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tasktriangle"></div>
+                        <div class="taskunder">
+                            <div class="taskcreator">@@@taskModel.Creator.Username</div>
+                            @if (taskModel.Subscribers.Any(u => u.User.Id == user.Id))
+                            {
+                                <div class="tasksubscribe1">
+                                    <img title="Завдання виконано" class="tasksubscribeimg1" src="../../Images/solved.png" width="28" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="tasksubscribe">
+                                    <img class="tasksubscribeimg" title="Підписатись на виконання" src="../../Images/subscribe_to_task.png" width="28" />
+                                </div>
+                            }
+                            <div class="taskcomments">
+                                <span class="taskcount">@taskModel.Comments.Count</span> <img src="../../Images/comments.png" align="middle" width="28" />
+                            </div>
+                            <div class="tasklikes">
+                                <span class="taskcount">@taskModel.Likes.Count</span> <img src="../../Images/like.png" width="28" />
+                            </div>
+
+                        </div>
+                        <input type="hidden" class="taskid" value="@taskModel.Id" />
+                    </div>
+                }
+            </div>
+            <div id="templateTask"></div>
+            <div id="templateTaskComment"></div>
+            <div id="templateSubscriber"></div>
+            <div id="templateAttachments"></div>
+            <div id="templateImages"></div>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,41 @@
+﻿#toolbar {
+    position: initial;
+}
+#categories {
+    margin-top: 30px;
+    width: 1213px;
+    display: flex;
+    flex-flow: row wrap;
+}
+.category {
+    margin-top: 40px;
+    flex: 1 1 33%;
+}
+.categoryheadertxt {
+    text-decoration: none;
+    color: black;
+    border-bottom: 1px solid #707070;
+    font-size: 20pt;
+}
+.subcategory {
+   margin-top: 10px; 
+}
+.subcategoryheadertxt {
+    text-decoration: none;
+    color: #1876ac;
+    border-bottom: 1px solid #1876ac;
+    font-size: 17pt;
+}
+#main {
+    margin-left: 10px;
+     width: 1213px;
+    margin: 30px auto;
+}
+#mainheader {
+    font-size: 25pt;
+    width: 1280px;
+    margin: 30px auto;
+    color: #303030;
+    position: relative;
+    left: 0px;
+}

@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "PassRecover";
+}
+
+<html>
+<head>
+    <link rel="SHORTCUT ICON" href="~/Images/favicon.png" type="image/x-icon"/> <title>Відновлення паролю</title>
+    @Scripts.Render("~/bundles/jquery")
+
+    <link rel="stylesheet" href="../../Content/null_style.css" />
+    <link rel="stylesheet" href="../../Content/signin_style.css" />
+
+    <script src="~/Scripts/My/settings_pass_recover.js"></script>
+</head>
+<body>
+
+    <div id="main" style="">
+        <div id="mainsubheader" style="margin-left:50px">
+            <span>Відновлення пароля</span>
+        </div>
+        <div>
+            <input type="password" id="inputSignInUsername" class="inputSignIn" placeholder="Новий пароль" />
+        </div>
+
+        <div>
+            <input type="password" id="inputSignInPassword" class="inputSignIn" placeholder="Ще раз введіть пароль" />
+        </div>
+
+        <div id="inputSignInBtn" style="margin: 20px 120px;">
+            Відновити
+        </div>
+    </div>
+</body>
+
+</html>

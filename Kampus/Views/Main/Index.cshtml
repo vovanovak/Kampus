@@ -1,0 +1,34 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<head>
+
+    <link rel="SHORTCUT ICON" href="~/Images/favicon.png" type="image/x-icon"/> <title>Головна</title>
+
+    @Scripts.Render("~/bundles/jquery")
+
+    <link rel="stylesheet" href="../../Content/null_style.css" />
+    <link rel="stylesheet" href="../../Content/main_style.css" />
+
+    
+</head>
+
+<body>
+    <div id="main">
+        <div>
+            <img id="mainbiglogo" src="../../Images/big_logo.png" />
+        </div>
+        <div >
+            <div id="mainsubheader" class="mainsubheadermain">студентська спільнота</div>
+        </div>
+        <a href="@Url.Action("Index", "Register")" style="text-decoration: none;">
+            <div id="mainsigninbtn">
+                <div id="mainsigninbtntext">Приєднатись</div>
+            </div>
+        </a>
+        <div id="mainregister">
+            <a href="@Url.Action("Index", "SignIn")" id="mainregistertext">Увійти</a> 
+        </div>
+    </div>
+</body>
