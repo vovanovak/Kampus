@@ -1,0 +1,14 @@
+﻿<script type="text/html" id="task-comment-template">
+    <div class="taskcomment">
+        <div class="taskcommentcontent">
+            <div class="taskcommentcontenttext" data-bind="text: Comments.Content">
+                
+            </div>
+        </div>
+        <div class="taskcommenttriangle"></div>
+        <div class="taskcommentcreator" data-bind="text: '@' + Comments.Creator.Username"></div>
+        <div>
+            <input class="taskcommentid" type="hidden" data-bind="attr: { value: Comments.Id }" />
+        </div>
+    </div>
+</script>

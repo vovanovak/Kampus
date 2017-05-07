@@ -1,0 +1,70 @@
+﻿.notificationicon {
+    display: inline-block;
+    height: 34px;
+}
+.notificationicon:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+.notificationicon:hover i {
+  color: #fff;
+}
+.notificationicon.on i {
+  color: #ddd;
+}
+.notifications {
+  width: 300px;
+  background: #fff;
+  padding: 0px;
+  border: 1px solid #ccc;
+  position: absolute;
+  display: none;
+  top: 38px;
+  left: -80px;
+  z-index: 10;
+}
+.notifications li 
+{
+  padding: 10px;
+  list-style-type: none;
+  font-size: 14pt;
+  background: #e4e4e4;
+  height: 60px;
+}
+.notifications li:nth-child(2n+0) {
+  background: #dedede;
+}
+.notificationlink {
+    text-decoration: none;
+    color: #777;
+}
+.message{
+    font-size: 12pt;
+    font-family: Arial;
+    text-decoration: none;
+    margin-top: 12px;
+    margin-left: 10px;
+    color:black;
+}
+.imageblock{
+    float: left;
+    height: 60px;
+    margin-right: 5px;
+}
+.notifimage{
+    width: 60px;
+    height: 60px;
+    border-radius: 60px;
+}
+.messageinfo{
+    text-decoration: none;
+}
+.messageusername{
+    font-size: 15pt;
+    font-style: italic;
+    color: #51beff;
+    margin-left: 10px;
+    text-decoration: none;
+}
+#readAllBtn{
+    display: none;
+}
