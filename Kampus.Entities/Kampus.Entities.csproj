@@ -56,36 +56,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="City.cs" />
     <Compile Include="DbEntity.cs" />
-    <Compile Include="ExecutionReview.cs" />
-    <Compile Include="File.cs" />
-    <Compile Include="Group.cs" />
-    <Compile Include="GroupPost.cs" />
-    <Compile Include="GroupPostComment.cs" />
-    <Compile Include="GroupPostLike.cs" />
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Notification.cs" />
-    <Compile Include="NotificationType.cs" />
-    <Compile Include="TaskCategory.cs" />
-    <Compile Include="TaskComment.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="StudentDetails.cs" />
-    <Compile Include="KampusContext.cs" />
-    <Compile Include="Task.cs" />
-    <Compile Include="TaskLike.cs" />
-    <Compile Include="TaskSubcat.cs" />
-    <Compile Include="TaskSubscriber.cs" />
-    <Compile Include="University.cs" />
-    <Compile Include="UniversityFaculty.cs" />
-    <Compile Include="User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UserPermissions.cs" />
-    <Compile Include="UserRecovery.cs" />
-    <Compile Include="UserRole.cs" />
-    <Compile Include="WallPost.cs" />
-    <Compile Include="WallPostComment.cs" />
-    <Compile Include="WallPostLike.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

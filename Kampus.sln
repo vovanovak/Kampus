@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29020.237
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kampus.Entities", "Kampus.Entities\Kampus.Entities.csproj", "{4B369B79-6853-4926-9093-0F64E4283FFC}"
 EndProject
@@ -10,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kampus.DAL", "Kampus.DAL\Kampus.DAL.csproj", "{7294D489-33C2-4F5F-BCB6-AFD5AE352058}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kampus.Models", "Kampus.Models\Kampus.Models.csproj", "{0E7C4BF1-1FC2-4C2F-88C6-54764F3BBDFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kampus.Persistence", "Kampus.Persistence\Kampus.Persistence.csproj", "{6440BF42-561D-4643-B7EA-5A12F3E924F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kampus.Application", "Kampus.Application\Kampus.Application.csproj", "{DA0A0A27-11D7-417B-9BE0-BE4AA6046D38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,8 +37,19 @@ Global
 		{0E7C4BF1-1FC2-4C2F-88C6-54764F3BBDFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E7C4BF1-1FC2-4C2F-88C6-54764F3BBDFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E7C4BF1-1FC2-4C2F-88C6-54764F3BBDFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6440BF42-561D-4643-B7EA-5A12F3E924F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6440BF42-561D-4643-B7EA-5A12F3E924F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6440BF42-561D-4643-B7EA-5A12F3E924F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6440BF42-561D-4643-B7EA-5A12F3E924F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA0A0A27-11D7-417B-9BE0-BE4AA6046D38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA0A0A27-11D7-417B-9BE0-BE4AA6046D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA0A0A27-11D7-417B-9BE0-BE4AA6046D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA0A0A27-11D7-417B-9BE0-BE4AA6046D38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {73921B86-515A-4754-AE80-D5C73A3DCFA2}
 	EndGlobalSection
 EndGlobal
