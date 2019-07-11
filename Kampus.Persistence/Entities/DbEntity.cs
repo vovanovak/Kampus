@@ -1,4 +1,4 @@
-﻿namespace Kampus.Entities
+﻿namespace Kampus.Persistence.Entities
 {
     public class DbEntity
     {

@@ -1,5 +1,4 @@
-﻿using Kampus.Entities;
-using Kampus.Persistence.Entities.WallPostRelated;
+﻿using Kampus.Persistence.Entities.WallPostRelated;
 using System;
 using System.Collections.Generic;
 using System.Linq;

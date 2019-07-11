@@ -1,5 +1,4 @@
-﻿using Kampus.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Kampus.Persistence.Entities.UniversityRelated
 {

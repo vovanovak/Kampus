@@ -1,5 +1,4 @@
-﻿using Kampus.Entities;
-using Kampus.Persistence.Entities.UniversityRelated;
+﻿using Kampus.Persistence.Entities.UniversityRelated;
 
 namespace Kampus.Persistence.Entities.UserRelated
 {

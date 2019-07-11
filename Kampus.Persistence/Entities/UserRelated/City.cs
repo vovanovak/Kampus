@@ -1,6 +1,4 @@
-﻿using Kampus.Entities;
-
-namespace Kampus.Persistence.Entities.UserRelated
+﻿namespace Kampus.Persistence.Entities.UserRelated
 {
     public class City : DbEntity
     {

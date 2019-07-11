@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.ComponentModel.DataAnnotations;
-using Kampus.Entities;
 
 namespace Kampus.Models
 {
@@ -68,50 +65,5 @@ namespace Kampus.Models
         public virtual List<WallPostModel> Posts { get; set; }
         public virtual List<GroupModel> Groups { get; set; }
 
-    }
-
-    public class UserShortModel
-    {
-        public int? Id { get; set; }
-        public string Username { get; set; }
-        public string Avatar { get; set; }
-
-        public UserShortModel()
-        {
-        }
-
-        public static UserShortModel From(UserModel model)
-        {
-            UserShortModel u = new UserShortModel();
-            u.Id = model.Id;
-            u.Username = model.Username;
-            u.Avatar = model.Avatar;
-            return u;
-        }
-        public static UserShortModel From(int? id, string username, string avatar)
-        {
-            UserShortModel u = new UserShortModel();
-            u.Id = id;
-            u.Username = username;
-            u.Avatar = avatar;
-            return u;
-        }
-    }
-
-    public class UserSearchModel
-    {
-        public string Request { get; set; }
-
-        public string City { get; set; }
-
-        public string University { get; set; }
-        public string Faculty { get; set; }
-        public int? Course { get; set; }
-
-        public int? MinAge { get; set; }
-        public int? MaxAge { get; set; }
-
-        public int? MinRating { get; set; }
-        public int? MaxRating { get; set; }
     }
 }

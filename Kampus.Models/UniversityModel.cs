@@ -12,9 +12,4 @@ namespace Kampus.Models
 
         public List<UniversityFacultyModel> Faculties { get; set; }
     }
-
-    public class UniversityFacultyModel : Entity
-    {
-        public string Name { get; set; }
-    }
 }

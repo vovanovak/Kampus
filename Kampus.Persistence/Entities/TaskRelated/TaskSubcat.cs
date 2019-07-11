@@ -1,6 +1,4 @@
-﻿using Kampus.Entities;
-
-namespace Kampus.Persistence.Entities.TaskRelated
+﻿namespace Kampus.Persistence.Entities.TaskRelated
 {
     public class TaskSubcat : DbEntity
     {

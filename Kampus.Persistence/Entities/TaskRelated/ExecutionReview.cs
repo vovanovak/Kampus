@@ -1,5 +1,4 @@
-﻿using Kampus.Entities;
-using Kampus.Persistence.Entities.UserRelated;
+﻿using Kampus.Persistence.Entities.UserRelated;
 
 namespace Kampus.Persistence.Entities.TaskRelated
 {

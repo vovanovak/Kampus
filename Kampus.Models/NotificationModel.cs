@@ -1,5 +1,4 @@
 ﻿using System;
-using Kampus.Entities;
 
 namespace Kampus.Models
 {

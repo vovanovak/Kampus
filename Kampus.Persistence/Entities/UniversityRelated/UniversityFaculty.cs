@@ -1,6 +1,4 @@
-﻿using Kampus.Entities;
-
-namespace Kampus.Persistence.Entities.UniversityRelated
+﻿namespace Kampus.Persistence.Entities.UniversityRelated
 {
     public class UniversityFaculty : DbEntity
     {

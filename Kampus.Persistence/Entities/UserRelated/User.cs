@@ -1,5 +1,4 @@
-﻿using Kampus.Entities;
-using Kampus.Persistence.Entities.GroupRelated;
+﻿using Kampus.Persistence.Entities.GroupRelated;
 using Kampus.Persistence.Entities.MessageRelated;
 using Kampus.Persistence.Entities.TaskRelated;
 using Kampus.Persistence.Entities.WallPostRelated;

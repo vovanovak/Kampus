@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Kampus.Models
 {
@@ -17,16 +13,5 @@ namespace Kampus.Models
         public List<WallPostCommentModel> Comments { get; set; }
         public List<FileModel> Attachments { get; set; }
         public List<FileModel> Images { get; set; }
-    }
-
-    public class WallPostCommentModel: Entity
-    {
-        public DateTime CreationTime { get; set; }
-
-        public string Content { get; set; }
-
-        public UserShortModel Creator { get; set; }
-
-        public int WallPostId { get; set; }
     }
 }

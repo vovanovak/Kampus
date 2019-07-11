@@ -1,5 +1,4 @@
-﻿using Kampus.Entities;
-using Kampus.Persistence.Entities.AttachmentsRelated;
+﻿using Kampus.Persistence.Entities.AttachmentsRelated;
 using Kampus.Persistence.Entities.UserRelated;
 using System;
 using System.Collections.Generic;

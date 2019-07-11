@@ -39,27 +39,17 @@ namespace Kampus.Persistence.Contexts
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<File> Files { get; set; }
 
-        public KampusContext() : base("Notebook")
+        public KampusContext() : base()
         {
-            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<KampusContext>());
-
         }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        public KampusContext(DbContextOptions<KampusContext> options) : base(options)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
-
-            modelBuilder.Entity<WallPost>().HasMany(w => w.Comments).WithRequired(c => c.WallPost).WillCascadeOnDelete(true);
-            modelBuilder.Entity<WallPost>().HasMany(w => w.Likes).WithRequired(c => c.WallPost).WillCascadeOnDelete(true);
-            modelBuilder.Entity<WallPost>().HasMany(w => w.Attachments).WithOptional(c => c.WallPost).WillCascadeOnDelete(true);
-
-            //modelBuilder.Entity<WallPost>().WillCascadeOnDelete();
-            //modelBuilder.Entity<WallPost>().HasMany(w => w.Comments).WithRequired(w => w.WallPost).HasForeignKey(k => k.WallPostId).WillCascadeOnDelete(true);
-            //modelBuilder.Entity<WallPost>().HasMany(w => w.Likes).WithRequired(c => c.WallPost).HasForeignKey(k => k.).WillCascadeOnDelete(true);
-            //modelBuilder.Entity<WallPost>().HasMany(w => w.Comments).WithOptional().WillCascadeOnDelete();
-            //modelBuilder.Entity<WallPost>().HasMany(w => w.Likes).WithOptional().WillCascadeOnDelete();
-            //modelBuilder.Entity<WallPost>().HasMany(w => w.Attachments).WithOptional().WillCascadeOnDelete();
         }
     }
 }
