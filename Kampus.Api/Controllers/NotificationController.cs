@@ -1,33 +1,33 @@
-﻿using Kampus.Models;
+﻿using Kampus.Api.Constants;
+using Kampus.Api.Extensions;
+using Kampus.Application.Services;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
-using System.Linq;
 
 namespace Kampus.Controllers
 {
     public class NotificationController : Controller
     {
-        private IUnitOfWork _unitOfWork;
+        private readonly INotificationService _notificationService;
 
-        public NotificationController()
+        public NotificationController(INotificationService notificationService)
         {
-            _unitOfWork = UnitOfWorkResolver.UnitOfWork;
+            _notificationService = notificationService;
         }
 
         [HttpGet]
         public string GetNewNotifications()
         {
-            int userId = Convert.ToInt32(Session["CurrentUserId"]);
-            NotificationModel[] notifications = _unitOfWork.Notifications.GetNewNotifications(userId).ToArray();
+            var userId = HttpContext.Session.Get<int>(SessionKeyConstants.CurrentUserId);
+            var notifications = _notificationService.GetNewNotifications(userId);
             return JsonConvert.SerializeObject(notifications);
         }
 
         [HttpPost]
         public void ViewNotifications()
         {
-            int userId = Convert.ToInt32(Session["CurrentUserId"]);
-            _unitOfWork.Notifications.ViewUnseenNotifications(userId);
+            var userId = HttpContext.Session.Get<int>(SessionKeyConstants.CurrentUserId);
+            _notificationService.ViewUnseenNotifications(userId);
         }
-
     }
 }
