@@ -67,5 +67,12 @@ namespace Kampus.Application.Services.Users.Impl
                 smtp.Send(message);
             }
         }
+
+        public void SetNewPassword(string username, string password)
+        {
+            User user = _context.Users.First(u => u.Username == username);
+            user.Password = password;
+            _context.SaveChanges();
+        }
     }
 }

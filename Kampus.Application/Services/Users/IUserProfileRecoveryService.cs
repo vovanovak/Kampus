@@ -6,6 +6,7 @@ namespace Kampus.Application.Services.Users
     {
         void SendRecoveryLetter(UserRecovery recovery, string path);
         void RecoverPassword(string username, string email, string path);
+        void SetNewPassword(string username, string password);
         string ContainsRecoveryWithSuchHash(string str);
     }
 }

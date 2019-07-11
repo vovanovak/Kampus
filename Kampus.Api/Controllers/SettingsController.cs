@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Web;
-using System.Web.Mvc;
-using Kampus.DAL.Abstract;
-using Kampus.Models;
-using Kampus.DAL;
-using Kampus.DAL.Security;
-using Kampus.Api.Controllers;
+﻿using Kampus.Models;
+using Microsoft.AspNetCore.Mvc;
+using Kampus.Api.Constants;
+using Microsoft.AspNetCore.Http;
+using Kampus.Api.Extensions;
+using Kampus.Api.Services;
+using Kampus.Application.Services;
+using Kampus.Application.Services.Users;
 
 namespace Kampus.Controllers
 {
@@ -17,10 +13,24 @@ namespace Kampus.Controllers
     {
         //
         // GET: /Settings/
-        private IUnitOfWork _unitOfWork;
-        public SettingsController()
+        private readonly IUserService _userService;
+        private readonly IUserProfileRecoveryService _userProfileRecoveryService;
+        private readonly ICityService _cityService;
+        private readonly IUniversityService _universityService;
+        private readonly IFileService _fileService;
+
+        public SettingsController(
+            IUserService userService,
+            IUserProfileRecoveryService userProfileRecoveryService,
+            ICityService cityService,
+            IUniversityService universityService,
+            IFileService fileService)
         {
-            _unitOfWork = UnitOfWorkResolver.UnitOfWork;
+            _userService = userService;
+            _userProfileRecoveryService = userProfileRecoveryService;
+            _cityService = cityService;
+            _universityService = universityService;
+            _fileService = fileService;
         }
 
         public ActionResult Index()
@@ -32,31 +42,25 @@ namespace Kampus.Controllers
 
         public void InitViewBag()
         {
-            UserModel user =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
-            List<CityModel> cities = _unitOfWork.Cities.GetAll();
-            List<UniversityModel> universities = _unitOfWork.Universities.GetAll();
-            List<UniversityFacultyModel> faculties = universities.ElementAt(0).Faculties;
-
-            ViewBag.CurrentUser = user;
-            ViewBag.Cities = cities;
-            ViewBag.Universities = universities;
-            ViewBag.Faculties = faculties;
+            ViewBag.CurrentUser = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
+            ViewBag.Cities = _cityService.GetCities();
+            ViewBag.Universities = _universityService.GetUniversities();
+            ViewBag.Faculties = ViewBag.Universities.ElementAt(0).Faculties;
         }
 
         #region Change Avatar
         
         [HttpPost]
-        public ActionResult ChangeAvatar(HttpPostedFileBase file)
+        public ActionResult ChangeAvatar(IFormFile file)
         {
             InitViewBag();
 
-            int userid = Convert.ToInt32(Session["CurrentUserId"]);
-
+            int userId = HttpContext.Session.Get<int>(SessionKeyConstants.CurrentUserId);
 
             if (file != null)
             {
-                string path = FileController.SaveImage(HttpContext, file);
-                _unitOfWork.Users.SetAvatar(userid, path);
+                string path = _fileService.SaveImage(HttpContext, file);
+                _userService.SetAvatar(userId, path);
                 ViewBag.CurrentUser.Avatar = path;
             }
 
@@ -72,8 +76,8 @@ namespace Kampus.Controllers
         {
             InitViewBag();
 
-            int userId = Convert.ToInt32(Session["CurrentUserId"]);
-            _unitOfWork.Users.ChangePassword(userId, oldPassword, newPassword, newPasswordConfirm);
+            var userId = HttpContext.Session.Get<int>(SessionKeyConstants.CurrentUserId);
+            _userService.ChangePassword(userId, oldPassword, newPassword, newPasswordConfirm);
             return View("Index");
         }
 
@@ -86,8 +90,8 @@ namespace Kampus.Controllers
         {
             InitViewBag();
 
-            int userId = Convert.ToInt32(Session["CurrentUserId"]);
-            _unitOfWork.Users.ChangeStatus(userId, status);
+            int userId = HttpContext.Session.Get<int>(SessionKeyConstants.CurrentUserId);
+            _userService.ChangeStatus(userId, status);
 
             return View("Index");
         }
@@ -102,9 +106,9 @@ namespace Kampus.Controllers
         {
             InitViewBag();
 
-            int userId = Convert.ToInt32(Session["CurrentUserId"]);
+            int userId = HttpContext.Session.Get<int>(SessionKeyConstants.CurrentUserId);
 
-            _unitOfWork.Users.ChangeCity(userId, city);
+            _userService.ChangeCity(userId, city);
 
             return View("Index");
         }
@@ -118,8 +122,8 @@ namespace Kampus.Controllers
         {
             InitViewBag();
 
-            int userId = Convert.ToInt32(Session["CurrentUserId"]);
-            _unitOfWork.Users.ChangeStudentInfo(userId, university, faculty, course);
+            int userId = HttpContext.Session.Get<int>(SessionKeyConstants.CurrentUserId);
+            _userService.ChangeStudentInfo(userId, university, faculty, course);
 
             return View("Index");
         }
@@ -135,17 +139,17 @@ namespace Kampus.Controllers
 
         public void RecoverPassword(string username, string email)
         {
-            string path = Url.Action("PassRecover", "Settings", null, Request.Url.Scheme) + "?str=";
-            _unitOfWork.Users.RecoverPassword(username, email, path);
+            string path = Url.Action("PassRecover", "Settings", null, Request.Scheme) + "?str=";
+            _userProfileRecoveryService.RecoverPassword(username, email, path);
         }
 
         public ActionResult PassRecover(string str)
         {
-            string username = _unitOfWork.Users.ContainsRecoveryWithSuchHash(str);
+            string username = _userProfileRecoveryService.ContainsRecoveryWithSuchHash(str);
             
             if (username != null)
             {
-                Session.Add("RecoveryUsername", username);
+                HttpContext.Session.Add("RecoveryUsername", username);
                 return View();
             }
             return View("Error");
@@ -156,8 +160,8 @@ namespace Kampus.Controllers
         {
             if (password == password1)
             {
-                string username =.HttpContext.Session["RecoveryUsername"] as string;
-                _unitOfWork.Users.SetNewPassword(username, password);
+                var username = HttpContext.Session.Get<string>("RecoveryUsername");
+                _userProfileRecoveryService.SetNewPassword(username, password);
                 return 1;
             }
             return 0;

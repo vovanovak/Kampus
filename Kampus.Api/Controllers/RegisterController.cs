@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Kampus.Models;
-using Kampus.Api.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Kampus.Application.Services.Users;
+using Kampus.Api.Services;
+using Kampus.Application.Services;
+using Microsoft.AspNetCore.Http;
+using Kampus.Api.Extensions;
 
 namespace Kampus.Controllers
 {
@@ -11,12 +15,23 @@ namespace Kampus.Controllers
         //
         // GET: /Register/
 
-        private IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
+        private readonly IFileService _fileService;
+        private readonly ICityService _cityService;
+        private readonly IUniversityService _universityService;
+
         private static UserModel _userModel;
 
-        public RegisterController()
+        public RegisterController(
+            IUserService userService,
+            IFileService fileService,
+            ICityService cityService,
+            IUniversityService universityService)
         {
-            _unitOfWork = UnitOfWorkResolver.UnitOfWork;
+            _userService = userService;
+            _fileService = fileService;
+            _cityService = cityService;
+            _universityService = universityService;
         }
 
         public ActionResult Index()
@@ -30,7 +45,6 @@ namespace Kampus.Controllers
         {
             _userModel = new UserModel();
 
-            
             if (ModelState.IsValidField("FullName") &&
                 ModelState.IsValidField("Email") &&
                 ModelState.IsValidField("Password"))
@@ -60,7 +74,6 @@ namespace Kampus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Step2(UserModel u)
         {
-
             if (ModelState.IsValidField("DateOfBirth") &&
                 ModelState.IsValidField("UniversityName") &&
                 ModelState.IsValidField("UniversityFaculty") &&
@@ -88,22 +101,20 @@ namespace Kampus.Controllers
             return View(_userModel);
         }
 
-        
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Step3(HttpPostedFileBase file, string username)
+        public ActionResult Step3(IFormFile file, string username)
         {
             if (!string.IsNullOrEmpty(username))
             {
-                if (_unitOfWork.Users.ContainsUserWithSuchUsername(username))
+                if (_userService.ContainsUserWithSuchUsername(username))
                     return View("Step3", _userModel);
 
                 _userModel.Username = username;
 
                 if (file != null)
                 {
-                    _userModel.Avatar = FileController.SaveImage(HttpContext, file);
+                    _userModel.Avatar = _fileService.SaveImage(HttpContext, file);
                 }
 
                 return RedirectToAction("Step4");
@@ -123,7 +134,7 @@ namespace Kampus.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Step4(UserModel u)
         {
-            _unitOfWork.Users.RegisterUser(_userModel);
+            _userService.RegisterUser(_userModel);
             return RedirectToAction("Index", "SignIn");
         }
 
@@ -133,7 +144,7 @@ namespace Kampus.Controllers
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.Users.RegisterUser(u);
+                _userService.RegisterUser(u);
                 return View("Success");
             }
             else
@@ -147,27 +158,27 @@ namespace Kampus.Controllers
         [HttpGet]
         public string ContainsUserWithSuchUsername(string username)
         {
-            return (_unitOfWork.Users.ContainsUserWithSuchUsername(username)) ? "contains" : "no";
+            return _userService.ContainsUserWithSuchUsername(username) ? "contains" : "no";
         }
 
         [HttpGet]
         public bool ContainsUserWithSuchEmail(string email)
         {
-            return _unitOfWork.Users.ContainsUserWithSuchEmail(email);
+            return _userService.ContainsUserWithSuchEmail(email);
         }
 
         [HttpGet]
         public string GetUniversityFaculties(string name)
         {
-            return _unitOfWork.Universities.GetUniversityFaculties(name);
+            return _universityService.GetUniversityFaculties(name);
         }
 
         public void FillViewBag()
         {
-            List<CityModel> cities = _unitOfWork.Cities.GetCities();
+            List<CityModel> cities = _cityService.GetCities();
             ViewBag.Cities = cities;
 
-            List<UniversityModel> universities = _unitOfWork.Universities.GetUniversities();
+            List<UniversityModel> universities = _universityService.GetUniversities();
             ViewBag.Universities = universities;
 
             List<UniversityFacultyModel> faculties = universities.ElementAt(0).Faculties;
