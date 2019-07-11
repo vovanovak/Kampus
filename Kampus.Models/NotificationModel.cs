@@ -12,6 +12,6 @@ namespace Kampus.Models
         public bool Seen { get; set; }
         public UserShortModel Receiver { get; set; }
         public UserShortModel Sender { get; set; }
-        public NotificationType Type { get; set; }
+        public int Type { get; set; }
     }
 }

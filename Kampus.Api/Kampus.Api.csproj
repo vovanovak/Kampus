@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kampus.Application\Kampus.Application.csproj" />
+    <ProjectReference Include="..\Kampus.Models\Kampus.Models.csproj" />
+    <ProjectReference Include="..\Kampus.Persistence\Kampus.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -232,8 +232,6 @@ namespace Kampus.Entities.Migrations
 
             universityFaculties.ForEach(f => context.Faculties.AddOrUpdate(f));
             context.SaveChanges();
-
-
         }
     }
-}                           
+}

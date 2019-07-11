@@ -17,6 +17,8 @@ using Kampus.DAL.Abstract.Repositories;
 using Kampus.DAL.Enums;
 using Kampus.DAL.Exceptions;
 using Kampus.DAL.Security;
+using Kampus.Persistence.Entities.UserRelated;
+using Kampus.Persistence.Enums;
 
 namespace Kampus.DAL.Concrete.Repositories
 {
@@ -60,36 +62,7 @@ namespace Kampus.DAL.Concrete.Repositories
 
         protected override void UpdateEntry(User dbEntity, UserModel entity)
         {
-            dbEntity.Username = entity.Username;
-            dbEntity.Password = entity.Password;
-            dbEntity.Email = entity.Email;
-            dbEntity.Status = entity.Status;
-            dbEntity.Avatar = entity.Avatar;
-            dbEntity.Fullname = entity.FullName;
-            dbEntity.Rating = 0;
-            dbEntity.DateOfBirth = (entity.DateOfBirth >= (DateTime)SqlDateTime.MinValue) ? entity.DateOfBirth : (DateTime)DateTime.MinValue;
-            dbEntity.NotificationsLastChecked = DateTime.Now;
-            dbEntity.City = ctx.Cities.First(c => c.Name == entity.City);
-            dbEntity.Role = ctx.UserRoles.First(r => r.Name == "User");
-
-            if (entity.IsNotStudent)
-                dbEntity.StudentDetails = null;
-            else
-            {
-                if (dbEntity.StudentDetails == null)
-                    dbEntity.StudentDetails = new StudentDetails();
-
-                dbEntity.StudentDetails.Course = entity.UniversityCourse.Value;
-
-                if (dbEntity.StudentDetails.University == null)
-                    dbEntity.StudentDetails.University = new University();
-                dbEntity.StudentDetails.University = ctx.Universities.First(u => u.Name == entity.UniversityName);
-
-
-                if (dbEntity.StudentDetails.Faculty == null)
-                    dbEntity.StudentDetails.Faculty = new UniversityFaculty();
-                dbEntity.StudentDetails.Faculty = ctx.Faculties.First(u => u.Name == entity.UniversityFaculty && u.UniversityId == dbEntity.StudentDetails.University.Id);
-            }
+            
         }
 
         public UserModel GetByUsername(string username)
@@ -317,115 +290,7 @@ namespace Kampus.DAL.Concrete.Repositories
             return age;
         }
 
-        public UserSearchModel UpdateUserSearch(string request, string university, string faculty,
-            string city, int? course, int? minAge, int? maxAge, int? minRating, int? maxRating)
-        {
-            UserSearchModel model = new UserSearchModel
-            {
-                Request = request,
-                University = university,
-                Faculty = faculty,
-                City = city,
-                Course = course,
-                MinAge = minAge,
-                MaxAge = maxAge,
-                MinRating = minRating,
-                MaxRating = maxRating
-            };
-
-            return model;
-        }
-
-        public List<UserModel> SearchUsers(string request, string university, string faculty,
-            string city, int? course, int? minAge, int? maxAge, int? minRating, int? maxRating)
-        {
-            List<User> users = GetTable().Select(p => p).ToList();
-
-            if (!string.IsNullOrEmpty(request))
-            {
-                request = request.ToLower();
-
-                users.RemoveAll(
-                    u =>
-                        (u.Status == null || !u.Status.ToLower().Contains(request)) &&
-                        !u.Username.ToLower().Contains(request) &&
-                        !u.Fullname.ToLower().Contains(request));
-
-            }
-
-            if (!string.IsNullOrEmpty(university))
-            {
-                users.RemoveAll(
-                    u => ((u.StudentDetails == null) || !u.StudentDetails.University.Name.Contains(university)));
-            }
-
-            if (!string.IsNullOrEmpty(faculty))
-            {
-                users.RemoveAll(u => ((u.StudentDetails == null) || !u.StudentDetails.Faculty.Name.Contains(faculty)));
-            }
-
-            if (!string.IsNullOrEmpty(city))
-            {
-                users.RemoveAll(u => !u.City.Name.Contains(city));
-            }
-            if (course != null)
-            {
-                users.RemoveAll(u => ((u.StudentDetails == null) || u.StudentDetails.Course != course.Value));
-            }
-            if (minAge != null && maxAge != null && minAge < maxAge)
-            {
-                users.RemoveAll(u => CalculateAge(u.DateOfBirth) < minAge || CalculateAge(u.DateOfBirth) > maxAge);
-            }
-            else
-            {
-                if (minAge == null && maxAge != null)
-                {
-                    users.RemoveAll(u => CalculateAge(u.DateOfBirth) > maxAge);
-                }
-
-                if (maxAge == null && minAge != null)
-                {
-                    users.RemoveAll(u => CalculateAge(u.DateOfBirth) < minAge);
-                }
-            }
-            if (minRating != null && maxRating != null && minRating < maxRating)
-            {
-                users.RemoveAll(u => u.Rating < minRating || u.Rating > maxRating);
-            }
-            else
-            {
-                if (minRating == null && maxRating != null)
-                {
-                    users.RemoveAll(u => u.Rating > maxRating);
-                }
-
-                if (maxRating == null && minRating != null)
-                {
-                    users.RemoveAll(u => u.Rating < minRating);
-                }
-            }
-
-            return users.Any()
-                ? users.Select(u => new UserModel()
-                {
-                    Id = u.Id,
-                    Username = u.Username,
-                    Email = u.Email,
-                    Password = u.Password,
-                    DateOfBirth = u.DateOfBirth,
-                    FullName = u.Fullname,
-
-                    City = u.City.Name,
-                    Avatar = u.Avatar,
-                    UserRole = u.Role.Name,
-
-                    Status = u.Status,
-                    UniversityName = ((u.StudentDetails != null) ? u.StudentDetails.University.Name : ""),
-                    UniversityFaculty = ((u.StudentDetails != null) ? u.StudentDetails.Faculty.Name : ""),
-                    UniversityCourse = u.StudentDetails.Course
-                }).ToList()
-                : new List<UserModel>();
-        }
+        
 
         public bool ContainsUserWithSuchEmail(string email)
         {

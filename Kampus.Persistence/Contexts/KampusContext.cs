@@ -8,7 +8,6 @@ using Kampus.Persistence.Entities.UniversityRelated;
 using Kampus.Persistence.Entities.UserRelated;
 using Kampus.Persistence.Entities.WallPostRelated;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace Kampus.Persistence.Contexts
 {

@@ -58,6 +58,10 @@
       <Project>{4b369b79-6853-4926-9093-0f64e4283ffc}</Project>
       <Name>Kampus.Entities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Kampus.Persistence\Kampus.Persistence.csproj">
+      <Project>{6440BF42-561D-4643-B7EA-5A12F3E924F5}</Project>
+      <Name>Kampus.Persistence</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
