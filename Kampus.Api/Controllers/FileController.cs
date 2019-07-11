@@ -1,22 +1,31 @@
 ﻿using Kampus.Application.Extensions;
 using Kampus.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Kampus.Api.Controllers
 {
+    // TODO: Move logic to dedicated service
     public class FileController : Controller
     {
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        public FileController(IHostingEnvironment hostingEnvironment)
+        {
+            _hostingEnvironment = hostingEnvironment;
+        }
+
         public ActionResult Download(string path, string fileName)
         {
             try
             {
-                var fs = System.IO.File.OpenRead(this.Server.MapPath("~/Files/" + path));
-                return File(fs, "application/zip", fileName);
+                var absolutePath = _hostingEnvironment.WebRootPath + "/Files/" + path;
+                var bytes = System.IO.File.ReadAllBytes(absolutePath);
+                return File(bytes, "application/zip", fileName);
             }
             catch
             {
@@ -24,23 +33,25 @@ namespace Kampus.Api.Controllers
             }
         }
 
-        public static string SaveImage(HttpContext context, IFormFile file)
+        public string SaveImage(HttpContext context, IFormFile file)
         {
-            string filename = DateTime.Now.Ticks.ToString().GetEncodedHash().
+            string fileName = DateTime.Now.Ticks.ToString().GetEncodedHash().
                 Replace("\\", "a").Replace("/", "a").Replace("+", "b");
             string ext = file.FileName.Substring(file.FileName.LastIndexOf("."));
+            string relativePath = "/Images/" + fileName + ext;
+            string absolutePath = _hostingEnvironment.WebRootPath + "/Images/" + fileName + ext;
 
-            file.SaveAs(context.Server.MapPath("/Images/")
-                        + filename + ext);
+            SaveFile(file, absolutePath);
 
-            return "/Images/" + filename + ext;
+            return relativePath;
         }
 
-        public static FileModel SaveFile(HttpContext context, IFormFile file)
+        public FileModel SaveFile(IFormFile file)
         {
             var fileName = Convert.ToString(DateTime.Now.Ticks) + file.FileName.Substring(file.FileName.LastIndexOf("."));
-            var path = Path.Combine(context.Server.MapPath("~/Files/"), fileName);
-            file.SaveAs(path);
+            string absolutePath = _hostingEnvironment.WebRootPath + "/Images/" + fileName;
+
+            SaveFile(file, absolutePath);
 
             return new FileModel()
             {
@@ -49,16 +60,19 @@ namespace Kampus.Api.Controllers
             };
         }
 
-        public static List<FileModel> UploadFilesToServer(HttpContext context)
+        private static void SaveFile(IFormFile file, string absolutePath)
         {
-            List<FileModel> files = new List<FileModel>();
-
-            for (int i = 0; i < .Count; i++)
+            var content = new byte[file.Length];
+            using (var fs = file.OpenReadStream())
             {
-                files.Add(SaveFile(context, context.Request.Form.Files[i]));
+                fs.Read(content, 0, (int)file.Length);
             }
+            System.IO.File.WriteAllBytes(absolutePath, content);
+        }
 
-            return context.Request.Form.Files.Select(f => SaveFile(context, f)).ToList();
+        public List<FileModel> UploadFilesToServer(HttpContext context)
+        {
+            return context.Request.Form.Files.Select(f => SaveFile(f)).ToList();
         }
     }
 }
