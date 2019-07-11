@@ -8,7 +8,7 @@ using Kampus.Application.Services;
 using Microsoft.AspNetCore.Http;
 using Kampus.Api.Extensions;
 
-namespace Kampus.Controllers
+namespace Kampus.Api.Controllers
 {
     public class RegisterController : Controller
     {
@@ -52,7 +52,7 @@ namespace Kampus.Controllers
                 _userModel.Email = u.Email;
                 _userModel.Password = u.Password;
                 _userModel.FullName = u.FullName;
-                
+
                 FillViewBag();
 
                 return RedirectToAction("Step2");

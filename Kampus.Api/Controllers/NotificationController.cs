@@ -4,7 +4,7 @@ using Kampus.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace Kampus.Controllers
+namespace Kampus.Api.Controllers
 {
     public class NotificationController : Controller
     {

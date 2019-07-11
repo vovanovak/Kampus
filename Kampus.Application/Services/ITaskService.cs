@@ -1,19 +1,19 @@
 ﻿using Kampus.Models;
 using Kampus.Persistence.Enums;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Kampus.Application.Services
 {
     public interface ITaskService
     {
-        IReadOnlyList<TaskModel> GetUserTasks(int userId);
-        IReadOnlyList<TaskModel> GetUserSolvedTasks(int userId);
-        IReadOnlyList<TaskCategoryModel> GetTaskCategories();
-        IReadOnlyList<TaskSubcatModel> GetSubcategories(int TaskCategoryId);
-        IReadOnlyList<TaskModel> GetUserSubscribedTasks(int userId);
-        IReadOnlyList<TaskModel> GetUserExecutiveTasks(int userId);
+        List<TaskModel> GetAll();
+        List<TaskModel> GetUserTasks(int userId);
+        List<TaskModel> GetUserSolvedTasks(int userId);
+        List<TaskCategoryModel> GetTaskCategories();
+        List<TaskSubcatModel> GetSubcategories(int TaskCategoryId);
+        List<TaskModel> GetUserSubscribedTasks(int userId);
+        List<TaskModel> GetUserExecutiveTasks(int userId);
+        TaskModel GetById(int taskId);
         void CheckTaskAsHidden(int taskId);
         TaskModel CreateTask(int userId, string header, string content, int price,
             int category, int subcategory, List<FileModel> attachmentes);

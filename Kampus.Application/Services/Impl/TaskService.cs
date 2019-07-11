@@ -42,22 +42,22 @@ namespace Kampus.Application.Services.Impl
                 .Include(t => t.Attachments);
         }
 
-        public IReadOnlyList<TaskModel> GetUserTasks(int userId)
+        public List<TaskModel> GetUserTasks(int userId)
         {
             return GetTasks().Where(t => t.CreatorId == userId).Select(_taskMapper.Map).OrderByDescending(t => t.Id).ToList();
         }
 
-        public IReadOnlyList<TaskModel> GetUserSolvedTasks(int userId)
+        public List<TaskModel> GetUserSolvedTasks(int userId)
         {
             return GetTasks().Where(t => t.CreatorId == userId && t.Solved == true).Select(_taskMapper.Map).ToList();
         }
 
-        public IReadOnlyList<TaskCategoryModel> GetTaskCategories()
+        public List<TaskCategoryModel> GetTaskCategories()
         {
             return _context.TaskCategories.Select(c => new TaskCategoryModel() { Id = c.Id, Name = c.Name }).ToList();
         }
 
-        public IReadOnlyList<TaskSubcatModel> GetSubcategories(int taskCategoryId)
+        public List<TaskSubcatModel> GetSubcategories(int taskCategoryId)
         {
             return _context.TaskSubcats.Where(s => s.TaskCategoryId == taskCategoryId)
                            .Select(c => new TaskSubcatModel()
@@ -68,7 +68,7 @@ namespace Kampus.Application.Services.Impl
                            }).ToList();
         }
 
-        public IReadOnlyList<TaskModel> GetUserSubscribedTasks(int userId)
+        public List<TaskModel> GetUserSubscribedTasks(int userId)
         {
             User user = _context.Users.First(u => u.Id == userId);
 
@@ -85,7 +85,7 @@ namespace Kampus.Application.Services.Impl
             return subTasks;
         }
 
-        public IReadOnlyList<TaskModel> GetUserExecutiveTasks(int userId)
+        public List<TaskModel> GetUserExecutiveTasks(int userId)
         {
             return GetTasks().Where(t => t.ExecutiveId == userId).Select(_taskMapper.Map).ToList();
         }
@@ -479,6 +479,16 @@ namespace Kampus.Application.Services.Impl
                 return -1;
             else
                 return t.Executive.Id;
+        }
+
+        public List<TaskModel> GetAll()
+        {
+            return GetTasks().Select(_taskMapper.Map).ToList();
+        }
+
+        public TaskModel GetById(int taskId)
+        {
+            return _taskMapper.Map(GetTasks().Single(t => t.Id == taskId));
         }
     }
 }

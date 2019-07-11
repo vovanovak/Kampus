@@ -9,5 +9,6 @@ namespace Kampus.Api.Constants
         public const string CurrentUser = nameof(CurrentUser);
         public const string CurrentUserId = nameof(CurrentUserId);
         public const string UserProfile = nameof(UserProfile);
+        public const string UserProfileId = nameof(UserProfileId);
     }
 }

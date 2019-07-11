@@ -1,5 +1,4 @@
 ﻿using Kampus.Api.Constants;
-using Kampus.Api.Controllers;
 using Kampus.Api.Extensions;
 using Kampus.Api.Services;
 using Kampus.Application.Services;
@@ -10,7 +9,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Kampus.Controllers
+namespace Kampus.Api.Controllers
 {
     public class MessageController : Controller
     {
@@ -86,7 +85,7 @@ namespace Kampus.Controllers
             ViewBag.SecondUser = username;
 
             List<MessageModel> toViewBag = messangers.Select(u => messages.OrderBy(m => m.CreationDate).LastOrDefault()).ToList();
-            
+
             ViewBag.FirstMessages = toViewBag;
 
             ViewBag.CurrentUser = sender;
@@ -127,11 +126,11 @@ namespace Kampus.Controllers
 
             return JsonConvert.SerializeObject(new
             {
-                Id = last.Id,
-                Username = last.Sender.Username,
+                last.Id,
+                last.Sender.Username,
                 Receiver = last.Receiver.Username,
-                Content = last.Content,
-                Avatar = last.Sender.Avatar,
+                last.Content,
+                last.Sender.Avatar,
                 Files = last.Attachments.Where(a => !a.IsImage()),
                 Images = last.Attachments.Where(a => a.IsImage()),
                 IsSender = true
@@ -148,15 +147,15 @@ namespace Kampus.Controllers
             {
                 Messages = messages.Where(m => m.Sender.Id != senderId).Select(m => new
                 {
-                    Id = m.Id,
-                    Username = m.Sender.Username,
-                    Content = m.Content,
-                    Avatar = m.Sender.Avatar,
+                    m.Id,
+                    m.Sender.Username,
+                    m.Content,
+                    m.Sender.Avatar,
                     Files = m.Attachments.Where(a => !a.IsImage()),
                     Images = m.Attachments.Where(a => a.IsImage()),
                     IsSender = false
                 }).ToArray(),
-              //  Messangers = messangers
+                //  Messangers = messangers
             });
         }
     }

@@ -3,7 +3,7 @@ using Kampus.Api.Extensions;
 using Kampus.Application.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Kampus.Controllers
+namespace Kampus.Api.Controllers
 {
     public class MainController : Controller
     {
@@ -21,7 +21,7 @@ namespace Kampus.Controllers
         {
             return View();
         }
-        
+
         public ActionResult SignIn()
         {
             return View("SignIn");

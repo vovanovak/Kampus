@@ -7,7 +7,7 @@ using Kampus.Api.Services;
 using Kampus.Application.Services;
 using Kampus.Application.Services.Users;
 
-namespace Kampus.Controllers
+namespace Kampus.Api.Controllers
 {
     public class SettingsController : Controller
     {
@@ -49,7 +49,7 @@ namespace Kampus.Controllers
         }
 
         #region Change Avatar
-        
+
         [HttpPost]
         public ActionResult ChangeAvatar(IFormFile file)
         {
@@ -146,7 +146,7 @@ namespace Kampus.Controllers
         public ActionResult PassRecover(string str)
         {
             string username = _userProfileRecoveryService.ContainsRecoveryWithSuchHash(str);
-            
+
             if (username != null)
             {
                 HttpContext.Session.Add("RecoveryUsername", username);

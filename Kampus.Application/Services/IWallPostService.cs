@@ -6,6 +6,8 @@ namespace Kampus.Application.Services
 {
     public interface IWallPostService
     {
+        int GetLastWallPostId();
+        void Delete(int wallPostId);
         List<WallPostModel> GetAllPosts(int userId);
         WallPostModel WriteWallPost(int userId, int senderId, string content, List<FileModel> attachments);
         WallPostCommentModel WritePostComment(int userId, int postId, string text);

@@ -1,27 +1,29 @@
-﻿using Kampus.Api.Controllers;
-using Kampus.DAL;
-using Kampus.DAL.Abstract;
-using Kampus.DAL.Enums;
+﻿using Kampus.Api.Constants;
+using Kampus.Api.Extensions;
+using Kampus.Api.Services;
+using Kampus.Application.Services;
 using Kampus.Models;
+using Kampus.Persistence.Enums;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 
-namespace Kampus.Controllers
+namespace Kampus.Api.Controllers
 {
     public class WallPostController : Controller
     {
         //
         // GET: /WallPost/
-        private IUnitOfWork _unitOfWork;
+        private readonly IWallPostService _wallPostService;
+        private readonly IFileService _fileService;
+
         private static List<FileModel> _attachmentsWallpost;
 
-        public WallPostController()
+        public WallPostController(IWallPostService wallPostService, IFileService fileService)
         {
-            _unitOfWork = UnitOfWorkResolver.UnitOfWork;
+            _wallPostService = wallPostService;
+            _fileService = fileService;
         }
 
         public ActionResult Index()
@@ -35,18 +37,18 @@ namespace Kampus.Controllers
             if (_attachmentsWallpost == null)
                 _attachmentsWallpost = new List<FileModel>();
 
-            _attachmentsWallpost.AddRange(FileController.UploadFilesToServer(HttpContext).ToArray());
+            _attachmentsWallpost.AddRange(_fileService.UploadFilesToServer(HttpContext));
         }
 
         [HttpPost]
         public string WriteWallPost(string text)
         {
-            UserModel receiver =.HttpContext.Session[ HttpContext.Session[.UserProfile] as UserModel;
-            UserModel sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
+            UserModel receiver = HttpContext.Session.Get<UserModel>(SessionKeyConstants.UserProfile);
+            UserModel sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
 
-            WallPostModel last = _unitOfWork.WallPosts.WriteWallPost(receiver.Id, sender.Id, text, _attachmentsWallpost);
+            WallPostModel last = _wallPostService.WriteWallPost(receiver.Id, sender.Id, text, _attachmentsWallpost);
 
-            last.Id = _unitOfWork.WallPosts.GetAll().Last().Id;
+            last.Id = _wallPostService.GetLastWallPostId();
 
             if (_attachmentsWallpost == null)
                 _attachmentsWallpost = new List<FileModel>();
@@ -54,63 +56,64 @@ namespace Kampus.Controllers
 
             return JsonConvert.SerializeObject(new
             {
-                Id = last.Id,
-                Content = last.Content,
+                last.Id,
+                last.Content,
                 Likes = last.Likes.Count,
                 Sender = last.Sender.Username,
-                Username = last.Owner.Username,
-                Comments = last.Comments,
+                last.Owner.Username,
+                last.Comments,
                 Files = last.Attachments.Where(f => !f.IsImage()).ToList(),
                 Images = last.Attachments.Where(f => f.IsImage()).ToList(),
-                IsDeletable = (sender.Id == receiver.Id)
+                IsDeletable = sender.Id == receiver.Id
             });
         }
-        
+
         [HttpPost]
         public LikeResult LikeWallPost(int postId)
         {
-            var sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
-            return _unitOfWork.WallPosts.LikeWallPost(sender.Id, postId);
+            var sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
+            return _wallPostService.LikeWallPost(sender.Id, postId);
         }
 
         [HttpPost]
         public string WritePostComment(string text, int postId)
         {
-            var sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
-            var comment = _unitOfWork.WallPosts.WritePostComment(sender.Id, postId, text);
+            var sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
+            var comment = _wallPostService.WritePostComment(sender.Id, postId, text);
             return JsonConvert.SerializeObject(comment);
         }
 
         [HttpPost]
         public string DeleteWallPost(int postId)
         {
-            return JsonConvert.SerializeObject(new { Result = _unitOfWork.WallPosts.Delete(postId) });
+            _wallPostService.Delete(postId);
+            return JsonConvert.SerializeObject(new { Result = true });
         }
 
         public string GetNewWallPosts(int lastPostId)
         {
-            var receiver =.HttpContext.Session[ HttpContext.Session[.UserProfile] as UserModel;
-            var sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
+            var receiver = HttpContext.Session.Get<UserModel>(SessionKeyConstants.UserProfile);
+            var sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
 
-            return JsonConvert.SerializeObject(_unitOfWork.WallPosts
+            return JsonConvert.SerializeObject(_wallPostService
                 .GetLastWallPosts(receiver.Id, sender.Id, lastPostId).Select(last => (new
                 {
-                    Id = last.Id,
-                    Content = last.Content,
+                    last.Id,
+                    last.Content,
                     Likes = last.Likes.Count,
                     Sender = last.Sender.Username,
-                    Username = last.Owner.Username,
-                    Comments = last.Comments,
+                    last.Owner.Username,
+                    last.Comments,
                     Files = last.Attachments.Where(f => !f.IsImage()).ToList(),
                     Images = last.Attachments.Where(f => f.IsImage()).ToList(),
-                    IsDeletable = (last.Owner.Id == sender.Id)
+                    IsDeletable = last.Owner.Id == sender.Id
                 })).ToList());
         }
 
         [HttpGet]
         public string GetNewWallPostComments(int postId, int? postCommentId)
         {
-            WallPostCommentModel[] comments = _unitOfWork.WallPosts.GetNewWallPostComments(postId, postCommentId).ToArray();
+            var comments = _wallPostService.GetNewWallPostComments(postId, postCommentId);
             return JsonConvert.SerializeObject(comments);
         }
     }

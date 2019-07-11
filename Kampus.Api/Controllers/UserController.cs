@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Kampus.Controllers
+namespace Kampus.Api.Controllers
 {
     public class UserController : Controller
     {
@@ -71,7 +71,7 @@ namespace Kampus.Controllers
                 userProfile.Subscribers = _userConnectionsService.GetUserSubscribers(userProfile.Id);
 
                 ViewBag.UserProfile = userProfile;
-                
+
                 HttpContext.Session.Add(SessionKeyConstants.UserProfile, userProfile);
             }
             catch (Exception)
@@ -199,7 +199,7 @@ namespace Kampus.Controllers
         {
             var receiver = HttpContext.Session.Get<UserModel>(SessionKeyConstants.UserProfile);
             var sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
-            
+
             bool res = false;
 
             try
@@ -215,9 +215,9 @@ namespace Kampus.Controllers
             {
                 Console.WriteLine(e.Message);
             }
-            
+
             return JsonConvert.ToString(res);
-            
+
         }
 
         [HttpPost]

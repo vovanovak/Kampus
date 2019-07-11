@@ -217,5 +217,17 @@ namespace Kampus.Application.Services.Impl
             _context.SaveChanges();
             return model;
         }
+
+        public int GetLastWallPostId()
+        {
+            return _context.UserPosts.Last().Id;
+        }
+
+        public void Delete(int wallPostId)
+        {
+            var wallPost = _context.UserPosts.Single(p => p.Id == wallPostId);
+            _context.UserPosts.Remove(wallPost);
+            _context.SaveChanges();
+        }
     }
 }
