@@ -22,7 +22,7 @@ namespace Kampus.Application.Services.Impl
             _messageMapper = messageMapper;
         }
 
-        public IReadOnlyList<MessageModel> GetUserMessages(int userId)
+        public List<MessageModel> GetUserMessages(int userId)
         {
             return
                 _context.Messages.Where(m => m.SenderId == userId ||
@@ -69,7 +69,7 @@ namespace Kampus.Application.Services.Impl
             _context.SaveChanges();
         }
 
-        public IReadOnlyList<MessageModel> GetNewMessages(int senderId, int receiverId, int lastmsgid)
+        public List<MessageModel> GetNewMessages(int senderId, int receiverId, int lastmsgid)
         {
             DateTime time = _context.Messages.FirstOrDefault(m1 => m1.Id == lastmsgid).CreationDate;
 
@@ -81,7 +81,7 @@ namespace Kampus.Application.Services.Impl
             return messages;
         }
 
-        public IReadOnlyList<MessageModel> GetMessages(int senderId, int receiverId)
+        public List<MessageModel> GetMessages(int senderId, int receiverId)
         {
             List<MessageModel> messages =
                 _context.Messages.Where(m => (m.SenderId == senderId &&
@@ -94,7 +94,7 @@ namespace Kampus.Application.Services.Impl
             return messages;
         }
 
-        public IReadOnlyList<UserShortModel> GetUserMessangers(int userId)
+        public List<UserShortModel> GetUserMessangers(int userId)
         {
             List<Message> messages = _context.Messages.Where(m => m.SenderId == userId || m.ReceiverId == userId).ToList();
             List<UserShortModel> messangers = new List<UserShortModel>();
@@ -121,7 +121,7 @@ namespace Kampus.Application.Services.Impl
             return messangers;
         }
 
-        public IReadOnlyDictionary<UserShortModel, MessageModel> GetNewUserMessangers(int senderId)
+        public Dictionary<UserShortModel, MessageModel> GetNewUserMessangers(int senderId)
         {
             return _context.Messages.Where(m => m.ReceiverId == senderId &&
                     !_context.Messages.Any(m1 => m1.ReceiverId == senderId))

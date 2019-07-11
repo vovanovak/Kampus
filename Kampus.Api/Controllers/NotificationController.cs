@@ -1,12 +1,7 @@
-﻿using Kampus.DAL;
-using Kampus.DAL.Abstract;
-using Kampus.Models;
+﻿using Kampus.Models;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 
 namespace Kampus.Controllers
 {

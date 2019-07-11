@@ -53,7 +53,7 @@ namespace Kampus.Controllers
 
         public ActionResult Index()
         {
-            UserModel sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
 
             ViewBag.Tasks = _unitOfWork.Tasks.GetAll().OrderByDescending(t => t.Id).ToList();
             ViewBag.CurrentUser = sender;
@@ -66,7 +66,7 @@ namespace Kampus.Controllers
 
         public ActionResult Id(int id)
         {
-            UserModel user = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel user =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
             TaskModel task = _unitOfWork.Tasks.GetEntityById(id);
 
             ViewBag.CurrentUser = user;
@@ -78,7 +78,7 @@ namespace Kampus.Controllers
         public ActionResult SearchTasks(string request, int? category, int? subcategory,
             int? minprice, int? maxprice, int? solved, int? executive, int? subscribed)
         {
-            UserModel sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
 
             if (solved != null)
             {
@@ -110,7 +110,7 @@ namespace Kampus.Controllers
 
         public ActionResult Categories()
         {
-            UserModel sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
             ViewBag.CurrentUser = sender;
 
             List<TaskCategoryModel> categories = _unitOfWork.Tasks.GetTaskCategories().DistinctBy(s => s.Name).ToList();
@@ -167,7 +167,7 @@ namespace Kampus.Controllers
                 Session.Add("UserProfileId", userId);
 
             UserModel profile = _unitOfWork.Users.GetEntityById(userId);
-            UserModel sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
 
             profile.Tasks = _unitOfWork.Tasks.GetUserTasks(profile.Id)
                 .Where(t => !(t.Solved == true)).ToList();
@@ -181,7 +181,7 @@ namespace Kampus.Controllers
 
         public ActionResult ViewHomeTasks()
         {
-            UserModel user = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel user =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
             UserModel sender = user;
 
             user.Tasks = _unitOfWork.Tasks.GetUserTasks(user.Id);
@@ -197,7 +197,7 @@ namespace Kampus.Controllers
         [HttpPost]
         public string WriteTaskComment(int taskId, string text)
         {
-            UserModel sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
             var comment = _unitOfWork.Tasks.WriteTaskComment(sender, taskId, text);
             return JsonConvert.SerializeObject(comment);
         }
@@ -205,7 +205,7 @@ namespace Kampus.Controllers
         [HttpPost]
         public LikeResult LikeTask(int taskId)
         {
-            UserModel sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
             ViewBag.CurrentUser = sender;
             return _unitOfWork.Tasks.LikeTask(sender, taskId);
         }
@@ -213,7 +213,7 @@ namespace Kampus.Controllers
         [HttpPost]
         public string SubscribeOnTask(int taskId, int? taskPrice)
         {
-            UserModel sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
 
             try
             {

@@ -74,7 +74,7 @@ namespace Kampus.Controllers
                 
                 HttpContext.Session.Add(SessionKeyConstants.UserProfile, userProfile);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return View("Error");
             }

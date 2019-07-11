@@ -41,8 +41,8 @@ namespace Kampus.Controllers
         [HttpPost]
         public string WriteWallPost(string text)
         {
-            UserModel receiver = Session[SessionKeyConstants.UserProfile] as UserModel;
-            UserModel sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel receiver =.HttpContext.Session[ HttpContext.Session[.UserProfile] as UserModel;
+            UserModel sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
 
             WallPostModel last = _unitOfWork.WallPosts.WriteWallPost(receiver.Id, sender.Id, text, _attachmentsWallpost);
 
@@ -69,14 +69,14 @@ namespace Kampus.Controllers
         [HttpPost]
         public LikeResult LikeWallPost(int postId)
         {
-            var sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            var sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
             return _unitOfWork.WallPosts.LikeWallPost(sender.Id, postId);
         }
 
         [HttpPost]
         public string WritePostComment(string text, int postId)
         {
-            var sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            var sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
             var comment = _unitOfWork.WallPosts.WritePostComment(sender.Id, postId, text);
             return JsonConvert.SerializeObject(comment);
         }
@@ -89,8 +89,8 @@ namespace Kampus.Controllers
 
         public string GetNewWallPosts(int lastPostId)
         {
-            var receiver = Session[SessionKeyConstants.UserProfile] as UserModel;
-            var sender = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            var receiver =.HttpContext.Session[ HttpContext.Session[.UserProfile] as UserModel;
+            var sender =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
 
             return JsonConvert.SerializeObject(_unitOfWork.WallPosts
                 .GetLastWallPosts(receiver.Id, sender.Id, lastPostId).Select(last => (new

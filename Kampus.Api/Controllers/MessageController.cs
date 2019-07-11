@@ -1,13 +1,14 @@
-﻿using Kampus.Api.Controllers;
-using Kampus.DAL;
-using Kampus.DAL.Abstract;
+﻿using Kampus.Api.Constants;
+using Kampus.Api.Controllers;
+using Kampus.Api.Extensions;
+using Kampus.Api.Services;
+using Kampus.Application.Services;
+using Kampus.Application.Services.Users;
 using Kampus.Models;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 
 namespace Kampus.Controllers
 {
@@ -16,20 +17,24 @@ namespace Kampus.Controllers
         //
         // GET: /Message/
 
-        private IUnitOfWork _unitOfWork;
+        private readonly IMessageService _messageService;
+        private readonly IUserService _userService;
+        private readonly IFileService _fileService;
+
         private static List<FileModel> _attachmentsMessages;
 
-        public MessageController()
+        public MessageController(IMessageService messageService, IUserService userService)
         {
-            _unitOfWork = UnitOfWorkResolver.UnitOfWork;
+            _messageService = messageService;
+            _userService = userService;
         }
 
         public ActionResult Index()
         {
-            UserModel sender = Session["CurrentUser"] as UserModel;
+            UserModel sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
 
-            List<MessageModel> messages = _unitOfWork.Messages.GetUserMessages(sender.Id);
-            List<UserShortModel> messangers = _unitOfWork.Messages.GetUserMessangers(sender.Id);
+            List<MessageModel> messages = _messageService.GetUserMessages(sender.Id);
+            List<UserShortModel> messangers = _messageService.GetUserMessangers(sender.Id);
 
             if (messangers.Any(u => u.Id == sender.Id))
                 messangers.RemoveAll(u => u.Id == sender.Id);
@@ -37,7 +42,7 @@ namespace Kampus.Controllers
             var firstOrDefault = messangers.FirstOrDefault();
             if (firstOrDefault != null)
             {
-                UserModel receiver = _unitOfWork.Users.GetByUsername(firstOrDefault.Username);
+                UserModel receiver = _userService.GetByUsername(firstOrDefault.Username);
 
                 ViewBag.Messangers = messangers;
                 ViewBag.SecondUser = receiver.Username;
@@ -50,7 +55,7 @@ namespace Kampus.Controllers
                 ViewBag.CurrentUser = sender;
                 ViewBag.UserProfile = receiver;
 
-                ViewBag.Messages = _unitOfWork.Messages.GetMessages(sender.Id, receiver.Id).OrderBy(m => m.CreationDate.Ticks);
+                ViewBag.Messages = _messageService.GetMessages(sender.Id, receiver.Id).OrderBy(m => m.CreationDate.Ticks);
             }
             else
             {
@@ -63,12 +68,12 @@ namespace Kampus.Controllers
 
         public ActionResult Conversation(string username)
         {
-            UserModel sender = Session["CurrentUser"] as UserModel;
-            UserModel receiver = _unitOfWork.Users.GetByUsername(username);
+            UserModel sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
+            UserModel receiver = _userService.GetByUsername(username);
 
-            List<MessageModel> messages = _unitOfWork.Messages.GetUserMessages(sender.Id);
+            List<MessageModel> messages = _messageService.GetUserMessages(sender.Id);
 
-            List<UserShortModel> messangers = _unitOfWork.Messages.GetUserMessangers(sender.Id);
+            List<UserShortModel> messangers = _messageService.GetUserMessangers(sender.Id);
 
             messangers.RemoveAll(u => u.Id == sender.Id);
 
@@ -87,7 +92,7 @@ namespace Kampus.Controllers
             ViewBag.CurrentUser = sender;
             ViewBag.UserProfile = receiver;
 
-            ViewBag.Messages = _unitOfWork.Messages.GetMessages(sender.Id, receiver.Id);
+            ViewBag.Messages = _messageService.GetMessages(sender.Id, receiver.Id);
 
             return View("Conversation");
         }
@@ -98,20 +103,21 @@ namespace Kampus.Controllers
             if (_attachmentsMessages == null)
                 _attachmentsMessages = new List<FileModel>();
 
-            _attachmentsMessages.AddRange(FileController.UploadFilesToServer(HttpContext).ToArray());
+            var files = _fileService.UploadFilesToServer(HttpContext);
+            _attachmentsMessages.AddRange(files);
         }
 
         [HttpPost]
         public string WriteMessage(int receiverId, string text)
         {
-            UserModel sender = Session["CurrentUser"] as UserModel;
-            UserModel receiver = _unitOfWork.Users.GetEntityById(receiverId);
+            UserModel sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
+            UserModel receiver = _userService.GetById(receiverId);
 
-            _unitOfWork.Messages.WriteMessage(sender.Id, receiverId, text, _attachmentsMessages);
+            _messageService.WriteMessage(sender.Id, receiverId, text, _attachmentsMessages);
 
-            List<MessageModel> messages = _unitOfWork.Messages.GetUserMessages(sender.Id);
+            List<MessageModel> messages = _messageService.GetUserMessages(sender.Id);
 
-            List<MessageModel> models = _unitOfWork.Messages.GetMessages(sender.Id, receiverId);
+            List<MessageModel> models = _messageService.GetMessages(sender.Id, receiverId);
             ViewBag.Messages = models;
 
             if (_attachmentsMessages != null)
@@ -135,8 +141,8 @@ namespace Kampus.Controllers
         [HttpGet]
         public string GetNewMessages(int senderId, int receiverId, int lastMsgId)
         {
-            var messages = _unitOfWork.Messages.GetNewMessages(senderId, receiverId, lastMsgId);
-            //var messangers = _unitOfWork.Messages.GetNewUserMessangers(senderId);
+            var messages = _messageService.GetNewMessages(senderId, receiverId, lastMsgId);
+            //var messangers = _messageService.GetNewUserMessangers(senderId);
 
             return JsonConvert.SerializeObject(new
             {

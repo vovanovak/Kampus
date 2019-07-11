@@ -32,7 +32,7 @@ namespace Kampus.Controllers
 
         public void InitViewBag()
         {
-            UserModel user = Session[SessionKeyConstants.CurrentUser] as UserModel;
+            UserModel user =.HttpContext.Session[ HttpContext.Session[.CurrentUser] as UserModel;
             List<CityModel> cities = _unitOfWork.Cities.GetAll();
             List<UniversityModel> universities = _unitOfWork.Universities.GetAll();
             List<UniversityFacultyModel> faculties = universities.ElementAt(0).Faculties;
@@ -156,7 +156,7 @@ namespace Kampus.Controllers
         {
             if (password == password1)
             {
-                string username = Session["RecoveryUsername"] as string;
+                string username =.HttpContext.Session["RecoveryUsername"] as string;
                 _unitOfWork.Users.SetNewPassword(username, password);
                 return 1;
             }
