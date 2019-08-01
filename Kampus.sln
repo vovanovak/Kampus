@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29020.237
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kampus.Entities", "Kampus.Entities\Kampus.Entities.csproj", "{4B369B79-6853-4926-9093-0F64E4283FFC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kampus", "Kampus\Kampus.csproj", "{7513BF1B-36FE-4796-AA1A-4C4CFE8FDF44}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kampus.DAL", "Kampus.DAL\Kampus.DAL.csproj", "{7294D489-33C2-4F5F-BCB6-AFD5AE352058}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kampus.Models", "Kampus.Models\Kampus.Models.csproj", "{0E7C4BF1-1FC2-4C2F-88C6-54764F3BBDFD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kampus.Persistence", "Kampus.Persistence\Kampus.Persistence.csproj", "{6440BF42-561D-4643-B7EA-5A12F3E924F5}"
@@ -17,24 +11,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kampus.Application", "Kampu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kampus.Host", "Kampus.Host\Kampus.Host.csproj", "{DDFD28C5-91D4-41E8-A9A2-925F02D73AF0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{596FE16F-B352-4EDD-9856-63B453D0FE0A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", "{91182840-F3FE-44AD-A454-913714DC7E2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kampus.Persistence.Migrations", "Migrations\Kampus.Persistence.Migrations\Kampus.Persistence.Migrations.csproj", "{EC54FDA2-D3BE-4992-84DF-818482CD245D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4B369B79-6853-4926-9093-0F64E4283FFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B369B79-6853-4926-9093-0F64E4283FFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B369B79-6853-4926-9093-0F64E4283FFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B369B79-6853-4926-9093-0F64E4283FFC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7513BF1B-36FE-4796-AA1A-4C4CFE8FDF44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7513BF1B-36FE-4796-AA1A-4C4CFE8FDF44}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7513BF1B-36FE-4796-AA1A-4C4CFE8FDF44}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7513BF1B-36FE-4796-AA1A-4C4CFE8FDF44}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7294D489-33C2-4F5F-BCB6-AFD5AE352058}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7294D489-33C2-4F5F-BCB6-AFD5AE352058}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7294D489-33C2-4F5F-BCB6-AFD5AE352058}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7294D489-33C2-4F5F-BCB6-AFD5AE352058}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0E7C4BF1-1FC2-4C2F-88C6-54764F3BBDFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E7C4BF1-1FC2-4C2F-88C6-54764F3BBDFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E7C4BF1-1FC2-4C2F-88C6-54764F3BBDFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,9 +39,16 @@ Global
 		{DDFD28C5-91D4-41E8-A9A2-925F02D73AF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDFD28C5-91D4-41E8-A9A2-925F02D73AF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDFD28C5-91D4-41E8-A9A2-925F02D73AF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC54FDA2-D3BE-4992-84DF-818482CD245D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC54FDA2-D3BE-4992-84DF-818482CD245D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC54FDA2-D3BE-4992-84DF-818482CD245D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC54FDA2-D3BE-4992-84DF-818482CD245D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EC54FDA2-D3BE-4992-84DF-818482CD245D} = {91182840-F3FE-44AD-A454-913714DC7E2E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {73921B86-515A-4754-AE80-D5C73A3DCFA2}

@@ -1,5 +1,4 @@
 ﻿using Kampus.Persistence.Entities.AttachmentsRelated;
-using Kampus.Persistence.Entities.GroupRelated;
 using Kampus.Persistence.Entities.MessageRelated;
 using Kampus.Persistence.Entities.NotificationRelated;
 using Kampus.Persistence.Entities.TaskRelated;
@@ -25,16 +24,12 @@ namespace Kampus.Persistence.Contexts
         public DbSet<TaskCategory> TaskCategories { get; set; }
         public DbSet<TaskSubcat> TaskSubcats { get; set; }
         public DbSet<University> Universities { get; set; }
-        public DbSet<Group> Groups { get; set; }
-        public DbSet<GroupPost> GroupPosts { get; set; }
-        public DbSet<GroupPostLike> GroupPostLikes { get; set; }
-        public DbSet<GroupPostComment> GroupPostComments { get; set; }
         public DbSet<WallPost> UserPosts { get; set; }
         public DbSet<WallPostComment> UserPostComments { get; set; }
         public DbSet<WallPostLike> UserPostLikes { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<UniversityFaculty> Faculties { get; set; }
-        public DbSet<UserPermissions> Permissionses { get; set; }
+        public DbSet<UserPermissions> Permissions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<File> Files { get; set; }
 

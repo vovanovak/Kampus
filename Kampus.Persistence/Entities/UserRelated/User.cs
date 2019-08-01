@@ -1,5 +1,4 @@
-﻿using Kampus.Persistence.Entities.GroupRelated;
-using Kampus.Persistence.Entities.MessageRelated;
+﻿using Kampus.Persistence.Entities.MessageRelated;
 using Kampus.Persistence.Entities.TaskRelated;
 using Kampus.Persistence.Entities.WallPostRelated;
 using System;
@@ -37,7 +36,6 @@ namespace Kampus.Persistence.Entities.UserRelated
         public virtual List<Task> Tasks { get; set; }
         public virtual List<Message> Messages { get; set; }
         public virtual List<WallPost> Posts { get; set; }
-        public virtual List<Group> Groups { get; set; }
         public virtual List<User> Friends { get; set; }
         public virtual List<User> Subscribers { get; set; }
         public virtual List<User> BlackList { get; set; }
