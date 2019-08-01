@@ -4,9 +4,9 @@
     ViewBag.Title = "Register";
 }
 
-@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript" src="~/lib/jquery/jquery-1.8.2.js"></script>
 
-<script src="~/Scripts/My/register.js"></script>
+<script src="~/js/register.js"></script>
 <h2>Register</h2>
 
 @using (Html.BeginForm("Index", "Register", FormMethod.Post))

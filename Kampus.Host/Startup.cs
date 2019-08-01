@@ -32,7 +32,10 @@ namespace Kampus.Host
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddApplicationServices().AddPersistence();
+            services
+                .AddApplicationDependencies()
+                .AddPersistenceDependencies();
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

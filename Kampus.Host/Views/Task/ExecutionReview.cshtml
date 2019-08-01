@@ -7,19 +7,20 @@
 
 <html>
 <head>
-    <link rel="SHORTCUT ICON" href="/Images/favicon.png" type="image/x-icon"/> <title>Оцінка виконання завдання</title>
+    <title>Оцінка виконання завдання</title>
+    <link rel="SHORTCUT ICON" href="~/images/favicon.png" type="image/x-icon" />
 
-    <link rel="stylesheet" href="~/Content/null_style.css"/>
-    <link rel="stylesheet" href="~/Content/register_style.css"/>
-    <link rel="stylesheet" href="~/Content/tasks_style.css" />
-    <link rel="stylesheet" href="~/Content/notifications_style.css"/>
-    <link rel="stylesheet" href="~/Content/toolbar_style.css" />
+    <link rel="stylesheet" href="~/css/null_style.css" />
+    <link rel="stylesheet" href="~/css/register_style.css" />
+    <link rel="stylesheet" href="~/css/tasks_style.css" />
+    <link rel="stylesheet" href="~/css/notifications_style.css" />
+    <link rel="stylesheet" href="~/css/toolbar_style.css" />
 
-    <script src="~/Scripts/My/notification.js"></script>
-    <script src="~/Scripts/My/task_execution_review.js"></script>
+    <script src="~/js/notification.js"></script>
+    <script src="~/js/task_execution_review.js"></script>
 </head>
 <body>
-@Html.Partial("Toolbar")
+    @Html.Partial("Toolbar")
     <div style="position: absolute; top: 0; bottom: 40px;left: 0;right: 0;width: 500px;height: 250px;margin: auto;">
         <div style="font-size: 25pt; width: 600px; text-align: center;">Залиште свій відгук про виконання завдання</div>
         <div id="mainregister">
@@ -29,19 +30,19 @@
                 @Html.AntiForgeryToken()
 
                 <div>
-                    @Html.TextBoxFor(model => model.Rating, new { id = "inputSignInName", @class = "inputSignIn", placeholder = "Оцінка(від 1 до 5)", type = "number", min="1", max="5"})
+                    @Html.TextBoxFor(model => model.Rating, new { id = "inputSignInName", @class = "inputSignIn", placeholder = "Оцінка(від 1 до 5)", type = "number", min = "1", max = "5" })
                     @Html.ValidationMessageFor(model => model.Rating)
                 </div>
 
                 <div>
-                    @Html.TextAreaFor(model => model.Review, new {id = "inputSignInName", @class = "inputSignIn", placeholder = "Відгук", type = "text"})
+                    @Html.TextAreaFor(model => model.Review, new { id = "inputSignInName", @class = "inputSignIn", placeholder = "Відгук", type = "text" })
                     @Html.ValidationMessageFor(model => model.Review)
                 </div>
-                
+
                 @Html.HiddenFor(model => model.TaskId, new { value = task.Id })
                 @Html.HiddenFor(model => model.Executor.Id, new { value = task.Executive.Id })
 
-                <input type="submit"  id="nextstep" value="Відправити" />
+                <input type="submit" id="nextstep" value="Відправити" />
             }
         </div>
     </div>

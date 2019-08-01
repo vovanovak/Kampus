@@ -7,7 +7,7 @@ namespace Kampus.Persistence
 {
     public static class PersistenceDependencyInjectionExtensions
     {
-        public static IServiceCollection AddPersistence(this IServiceCollection services)
+        public static IServiceCollection AddPersistenceDependencies(this IServiceCollection services)
         {
             services.AddDbContext<KampusContext>((sp, options) =>
             {

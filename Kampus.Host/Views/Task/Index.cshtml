@@ -11,20 +11,20 @@
 
 <html>
 <head>
-    <link rel="SHORTCUT ICON" href="/Images/favicon.png" type="image/x-icon"/> <title>Завдання</title>
+    <title>Завдання</title>
+    <link rel="SHORTCUT ICON" href="~/images/favicon.png" type="image/x-icon" />
 
-    <link rel="stylesheet" href="~/Content/null_style.css" />
-    <link rel="stylesheet" href="~/Content/attach_style.css" />
-    <link rel="stylesheet" href="~/Content/tasks_style.css" />
-    <link rel="stylesheet" href="~/Content/notifications_style.css"/>
-    <link rel="stylesheet" href="~/Content/toolbar_style.css" />
+    <link rel="stylesheet" href="~/css/null_style.css" />
+    <link rel="stylesheet" href="~/css/attach_style.css" />
+    <link rel="stylesheet" href="~/css/tasks_style.css" />
+    <link rel="stylesheet" href="~/css/notifications_style.css" />
+    <link rel="stylesheet" href="~/css/toolbar_style.css" />
 
+    <script type="text/javascript" src="~/lib/jquery/jquery-1.8.2.js"></script>
 
-    @Scripts.Render("~/bundles/jquery")
-    
-    <script src="~/Scripts/Libs/knockout/knockout-3.4.0.js"></script>
-    <script src="~/Scripts/My/notification.js"></script>
-    <script src="~/Scripts/My/task_index.js"></script>
+    <script src="~/lib/knockout/knockout-3.4.0.js"></script>
+    <script src="~/js/notification.js"></script>
+    <script src="~/js/task_index.js"></script>
     <script>
         $(document).ready(() => {
             taskIndexInit();
@@ -156,8 +156,8 @@
                                         {
                                             <div class="filerefcont">
                                                 <img src="/Images/round/attachment.png" /> @Html.ActionLink(link.FileName,
-                                                        "Download", "Download", new { path = link.RealFileName, fileName = link.FileName },
-                                                        new { @class = "fileref" })
+             "Download", "Download", new { path = link.RealFileName, fileName = link.FileName },
+             new { @class = "fileref" })
                                             </div>
                                         }
                                     </div>
@@ -191,7 +191,7 @@
                                     <span class="tasksubscribersheader">Виконавець: </span>
                                     <div>
                                         <a style="text-decoration: none;" href="@Url.Action("Id", "User", new {Id = taskModel.Executive.Id})"><span class="tasksubscribersuser">@@@taskModel.Executive.Username </span></a>
-                                   </div>
+                                    </div>
                                 </div>
                             }
                             <div class="taskcommentscontent">

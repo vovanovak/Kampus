@@ -22,10 +22,11 @@ namespace Kampus.Host.Controllers
 
         private static List<FileModel> _attachmentsMessages;
 
-        public MessageController(IMessageService messageService, IUserService userService)
+        public MessageController(IMessageService messageService, IUserService userService, IFileService fileService)
         {
             _messageService = messageService;
             _userService = userService;
+            _fileService = fileService;
         }
 
         public ActionResult Index()

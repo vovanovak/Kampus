@@ -19,8 +19,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Scripts\" />
-    <Folder Include="Templates\" />
+    <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\templates\attachment_file.html" />
+    <None Include="wwwroot\templates\attachment_image.html" />
+    <None Include="wwwroot\templates\message.html" />
+    <None Include="wwwroot\templates\messanger.html" />
+    <None Include="wwwroot\templates\task.html" />
+    <None Include="wwwroot\templates\task_comment.html" />
+    <None Include="wwwroot\templates\task_executive.html" />
+    <None Include="wwwroot\templates\task_subscriber.html" />
+    <None Include="wwwroot\templates\wallpost.html" />
+    <None Include="wwwroot\templates\wallpost_comment.html" />
   </ItemGroup>
 
 </Project>

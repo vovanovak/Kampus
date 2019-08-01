@@ -7,22 +7,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="SHORTCUT ICON" href="/Images/favicon.png" type="image/x-icon"/> <title>Повідомлення</title>
-    <link rel="stylesheet" href="~/Content/null_style.css" />
-    <link rel="stylesheet" href="~/Content/messages_style.css"/>
-    <link rel="stylesheet" href="~/Content/notifications_style.css"/>
-    <link rel="stylesheet" href="~/Content/toolbar_style.css" />
-    <link rel="stylesheet" href="~/Content/attach_style.css" />
+    <title>Повідомлення</title>
 
-    @Scripts.Render("~/bundles/jquery")
+    <link rel="SHORTCUT ICON" href="~/images/favicon.png" type="image/x-icon"/> 
 
-    <script src="~/Scripts/Libs/knockout/knockout-3.4.0.js" type="text/javascript"></script>
-    <script src="~/Scripts/My/notification.js" type="text/javascript"></script>
-    <script src="~/Scripts/My/message_conversation.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="~/css/null_style.css" />
+    <link rel="stylesheet" href="~/css/messages_style.css"/>
+    <link rel="stylesheet" href="~/css/notifications_style.css"/>
+    <link rel="stylesheet" href="~/css/toolbar_style.css" />
+    <link rel="stylesheet" href="~/css/attach_style.css" />
+
+    <script type="text/javascript" src="~/lib/jquery/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="~/lib/knockout/knockout-3.4.0.js"></script>
+    <script type="text/javascript" src="~/js/notification.js"></script>
+    <script type="text/javascript" src="~/js/message_conversation.js"></script>
 </head>
 <body>
 <div>
-    @Html.Partial("Toolbar")
+    @await Html.PartialAsync("Toolbar")
 
     <div id="wrapper">
         <div id="aside">

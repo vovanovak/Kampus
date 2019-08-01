@@ -2,22 +2,21 @@
 @{
     ViewBag.Title = "Friends";
     List<UserShortModel> friends = ViewBag.CurrentUser.Friends;
-    
+
 }
 
 <html>
 <head>
-    <link rel="SHORTCUT ICON" href="/Images/favicon.png" type="image/x-icon"/>
     <title>Друзі</title>
-    
-    @Scripts.Render("~/bundles/jquery")
+    <link rel="SHORTCUT ICON" href="~/images/favicon.png" type="image/x-icon" />
 
-    <link rel="stylesheet" href="~/Content/null_style.css" />
-    <link rel="stylesheet" href="~/Content/friends_style.css"/>
-    <link rel="stylesheet" href="~/Content/notifications_style.css"/>
-    <link rel="stylesheet" href="~/Content/toolbar_style.css" />
+    <link rel="stylesheet" href="~/css/null_style.css" />
+    <link rel="stylesheet" href="~/css/friends_style.css" />
+    <link rel="stylesheet" href="~/css/notifications_style.css" />
+    <link rel="stylesheet" href="~/css/toolbar_style.css" />
 
-    <script src="~/Scripts/My/notification.js"></script>
+    <script type="text/javascript" src="~/lib/jquery/jquery-1.8.2.js"></script>
+    <script src="~/js/notification.js"></script>
 </head>
 <body>
     @Html.Partial("Toolbar")
@@ -53,7 +52,7 @@
                                 <a class="buttonadd link" href="@Url.Action("FriendsById", "User", new { Id = user.Id })">Переглянути друзів</a>
                             </div>
                             <div>
-                                <a class="buttonadd link" href="@Url.Action("Conversation", "Home", new { Username = user.Username })">Написати повідомлення</a>
+                                <a class="buttonadd link" href="@Url.Action("Conversation", "Message", new { Username = user.Username })">Написати повідомлення</a>
                             </div>
                         }
                     </div>

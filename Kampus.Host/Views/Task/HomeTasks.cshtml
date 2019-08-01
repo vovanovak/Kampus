@@ -5,25 +5,27 @@
     List<TaskModel> tasks = ViewBag.UserProfile.Tasks ?? new List<TaskModel>();
     UserModel user = ViewBag.CurrentUser;
     SearchTaskModel search = ViewBag.SearchTask;
-    
+
 }
 
 <html>
 <head>
-    <link rel="SHORTCUT ICON" href="/Images/favicon.png" type="image/x-icon"/> <title>Мої завдання</title>
+    <title>Мої завдання</title>
+    <link rel="SHORTCUT ICON" href="~/images/favicon.png" type="image/x-icon" />
 
-    <link rel="stylesheet" href="~/Content/null_style.css"/>
-    <link rel="stylesheet" href="~/Content/attach_style.css" />
-    <link rel="stylesheet" href="~/Content/tasks_style.css"/>
-    <link rel="stylesheet" href="~/Content/notifications_style.css" />
-    <link rel="stylesheet" href="~/Content/toolbar_style.css" />
+    <link rel="stylesheet" href="~/css/null_style.css" />
+    <link rel="stylesheet" href="~/css/attach_style.css" />
+    <link rel="stylesheet" href="~/css/tasks_style.css" />
+    <link rel="stylesheet" href="~/css/notifications_style.css" />
+    <link rel="stylesheet" href="~/css/toolbar_style.css" />
 
-    @Scripts.Render("~/bundles/jquery")
+    <script type="text/javascript" src="~/lib/jquery/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="~/lib/knockout/knockout-3.4.0.js"></script>
+    
+    <script src="~/js/notification.js"></script>
+    <script src="~/js/task_index.js"></script>
+    <script src="~/js/task_home.js"></script>
 
-    <script src="~/Scripts/Libs/knockout/knockout-3.4.0.js"></script>
-    <script src="~/Scripts/My/notification.js"></script>
-    <script src="~/Scripts/My/task_index.js"></script>
-    <script src="~/Scripts/My/task_home.js"></script>
     <script>
         $(document).ready(() => {
             taskIndexInit();
@@ -34,362 +36,366 @@
 <body>
     @Html.Partial("Toolbar")
     <div id="wrapper">
-    <div id="aside">
-        <div id="tasksearchform">
-            @using (Html.BeginForm("SearchTasks", "Task", FormMethod.Get))
-            {
-                <input type="text" class="inputSignIn" id="searchrequest"
-                       value="@(search.Request ?? "")" name="request" placeholder="Пошук"/>
+        <div id="aside">
+            <div id="tasksearchform">
+                @using (Html.BeginForm("SearchTasks", "Task", FormMethod.Get))
+                {
+                    <input type="text" class="inputSignIn" id="searchrequest"
+                           value="@(search.Request ?? "")" name="request" placeholder="Пошук" />
 
-                <div class="searchheader">Категорія</div>
-                <div class="slate" id="searchcategory" title="Категорія">
-                    <select name="category">
-                        <option value="-1"></option>
-                        @if (search.CategoryId == null)
-                        {
-                            foreach (TaskCategoryModel category in ViewBag.TaskCategories)
+                    <div class="searchheader">Категорія</div>
+                    <div class="slate" id="searchcategory" title="Категорія">
+                        <select name="category">
+                            <option value="-1"></option>
+                            @if (search.CategoryId == null)
                             {
-                                <option value="@category.Id">@category.Name</option>
-                            }
-                        }
-                        else
-                        {
-                            foreach (TaskCategoryModel category in ViewBag.TaskCategories)
-                            {
-                                if (category.Id == search.CategoryId)
-                                {
-                                    <option value="@category.Id" selected>@category.Name</option>
-                                }
-                                else
+                                foreach (TaskCategoryModel category in ViewBag.TaskCategories)
                                 {
                                     <option value="@category.Id">@category.Name</option>
                                 }
                             }
-                        }
-                    </select>
-                </div>
-                <div class="searchheader">Підкатегорія</div>
-                <div class="slate" id="searchsubcategory" title="Підкатегорія">
-                    <select name="subcategory">
-                        <option value="-1"></option>
-                        @if (search.SubcategoryId == null)
-                        {
-                            foreach (TaskSubcatModel category in ViewBag.TaskSubcategories)
+                            else
                             {
-                                <option value="@category.Id">@category.Name</option>
-                            }
-                        }
-                        else
-                        {
-                            foreach (TaskSubcatModel category in ViewBag.TaskSubcategories)
-                            {
-                                if (category.Id == search.SubcategoryId)
+                                foreach (TaskCategoryModel category in ViewBag.TaskCategories)
                                 {
-                                    <option value="@category.Id" selected>@category.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@category.Id">@category.Name</option>
+                                    if (category.Id == search.CategoryId)
+                                    {
+                                        <option value="@category.Id" selected>@category.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
                                 }
                             }
-                        }
-                    </select>
-                </div>
-
-                <a class="searchlinkbtn" href="@Url.Action("Categories", "Task")">
-                    <div style="margin-top: 30px;">Пошук за категоріями</div>
-                </a>
-                <div class="searchheader">Ціна</div>
-                <div>
-                    <input type="number" name="minPrice" class="inputSignIn"
-                           value="@(search.MinPrice == null ? "" : search.MinPrice.Value.ToString())"
-                           id="searchminPrice" title="Мінімальна ціна"/>
-                    <input type="number" name="maxprice" class="inputSignIn"
-                           value="@(search.MaxPrice == null ? "" : search.MaxPrice.Value.ToString())"
-                           id="searchmaxprice" title="Максимальна ціна"/>
-                </div>
-
-                <a class="searchlinkbtn" href="@Url.Action("SearchTasks", "Task", new {subscribed = 1})">
-                    <div>Завдання на які ви підписані</div></a>
-                <br>
-                <a class="searchlinkbtn" href="@Url.Action("SearchTasks", "Task", new {executive = 1})">
-                    <div>Завдання які ви виконуєте</div>
-                </a>
-                <br>
-                <a class="searchlinkbtn" href="@Url.Action("SearchTasks", "Task", new {solved = 1})">
-                    <div>Виконані завдання</div>
-                </a>
-                <br>
-                <input type="submit" class="nextstepsearch" value="Пошук"/>
-            }
-        </div>
-    </div>
-
-    <div id="main">
-        <div id="mainheader">Завдання</div>
-
-        <div id="tasks">
-            <div id="newTasks" data-bind="template: {name: 'task-template', foreach: newTasks}">
-
-            </div>
-            @foreach (var taskModel in tasks)
-            {
-                <div class="task">
-                    <div class="taskheader">
-                        <div class="taskheadercontent">
-                            <div class="taskcat"><span class="taskcategory"> <span class="catSym">@@</span>@taskModel.CategoryName </span> <span class="taskcategory"><span class="catSym">@@</span>@taskModel.SubcategoryName</span></div>
-
-                            <div class="taskprice">@(taskModel.Price != null ? taskModel.Price.ToString() + " грн." : "" )</div>
-
-                            <div>
-                                <a href="@Url.Action("Id", "Task", new {id = taskModel.Id})" class="taskheadercontenttext">@taskModel.Header</a>
-                            </div>
-                        </div>
+                        </select>
                     </div>
-                    <div class="taskcommentshid">
-                        @if (taskModel.Attachments != null) { 
-                            if (taskModel.Attachments.Any(p => p.IsImage()))
+                    <div class="searchheader">Підкатегорія</div>
+                    <div class="slate" id="searchsubcategory" title="Підкатегорія">
+                        <select name="subcategory">
+                            <option value="-1"></option>
+                            @if (search.SubcategoryId == null)
                             {
-                                foreach (var image in taskModel.Attachments.Where(p => p.IsImage()))
+                                foreach (TaskSubcatModel category in ViewBag.TaskSubcategories)
                                 {
-                                    <img class="attachImg" src="/Files/@image.RealFileName" />
+                                    <option value="@category.Id">@category.Name</option>
                                 }
                             }
-                        }
-                    
-                        <div class="taskcontent">@taskModel.Content</div>
-                        @if (taskModel.Attachments != null) {
-                            if (taskModel.Attachments.Any(p => !p.IsImage()))
+                            else
                             {
-                                <div class="filerefs">
-                                    @foreach (var link in taskModel.Attachments.Where(p => !p.IsImage()))
+                                foreach (TaskSubcatModel category in ViewBag.TaskSubcategories)
+                                {
+                                    if (category.Id == search.SubcategoryId)
                                     {
-                                        <div class="filerefcont">
-                                            <img src="/Images/round/attachment.png" /> @Html.ActionLink(link.FileName,
-                                                            "Download", "File", new { path = link.RealFileName, fileName = link.FileName },
-                                                            new { @class = "fileref" })
-                                        </div>
+                                        <option value="@category.Id" selected>@category.Name</option>
                                     }
-                                </div>
-                            }
-                        }
-
-                        <div class="tasksubscribers">
-                            @if (taskModel.Subscribers.Any())
-                            {
-                                <span class="tasksubscribersheader">Підписники </span>
-                                <div>
-                                    @foreach (var sub in taskModel.Subscribers)
+                                    else
                                     {
-                                        <div class="tasksubscriber">
-                                            <a style="text-decoration: none;"
-                                               href="@Url.Action("Id", "User", new {Id = sub.Subscriber.Id})">
-                                                <span class="tasksubscribersuser">@@@sub.Subscriber.Username @(sub.Price == null || sub.Price == 0 ? "" : sub.Price + " грн.")</span>
-                                            </a>
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
 
-                                            @if (ViewBag.CurrentUser.Id == taskModel.Creator.Id)
-                                            {
-                                                if (taskModel.Executive == null)
+                    <a class="searchlinkbtn" href="@Url.Action("Categories", "Task")">
+                        <div style="margin-top: 30px;">Пошук за категоріями</div>
+                    </a>
+                    <div class="searchheader">Ціна</div>
+                    <div>
+                        <input type="number" name="minPrice" class="inputSignIn"
+                               value="@(search.MinPrice == null ? "" : search.MinPrice.Value.ToString())"
+                               id="searchminPrice" title="Мінімальна ціна" />
+                        <input type="number" name="maxprice" class="inputSignIn"
+                               value="@(search.MaxPrice == null ? "" : search.MaxPrice.Value.ToString())"
+                               id="searchmaxprice" title="Максимальна ціна" />
+                    </div>
+
+                    <a class="searchlinkbtn" href="@Url.Action("SearchTasks", "Task", new {subscribed = 1})">
+                        <div>Завдання на які ви підписані</div>
+                    </a>
+                    <br>
+                    <a class="searchlinkbtn" href="@Url.Action("SearchTasks", "Task", new {executive = 1})">
+                        <div>Завдання які ви виконуєте</div>
+                    </a>
+                    <br>
+                    <a class="searchlinkbtn" href="@Url.Action("SearchTasks", "Task", new {solved = 1})">
+                        <div>Виконані завдання</div>
+                    </a>
+                    <br>
+                    <input type="submit" class="nextstepsearch" value="Пошук" />
+                }
+            </div>
+        </div>
+
+        <div id="main">
+            <div id="mainheader">Завдання</div>
+
+            <div id="tasks">
+                <div id="newTasks" data-bind="template: {name: 'task-template', foreach: newTasks}">
+
+                </div>
+                @foreach (var taskModel in tasks)
+                {
+                    <div class="task">
+                        <div class="taskheader">
+                            <div class="taskheadercontent">
+                                <div class="taskcat"><span class="taskcategory"> <span class="catSym">@@</span>@taskModel.CategoryName </span> <span class="taskcategory"><span class="catSym">@@</span>@taskModel.SubcategoryName</span></div>
+
+                                <div class="taskprice">@(taskModel.Price != null ? taskModel.Price.ToString() + " грн." : "")</div>
+
+                                <div>
+                                    <a href="@Url.Action("Id", "Task", new {id = taskModel.Id})" class="taskheadercontenttext">@taskModel.Header</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="taskcommentshid">
+                            @if (taskModel.Attachments != null)
+                            {
+                                if (taskModel.Attachments.Any(p => p.IsImage()))
+                                {
+                                    foreach (var image in taskModel.Attachments.Where(p => p.IsImage()))
+                                    {
+                                        <img class="attachImg" src="/Files/@image.RealFileName" />
+                                    }
+                                }
+                            }
+
+                            <div class="taskcontent">@taskModel.Content</div>
+                            @if (taskModel.Attachments != null)
+                            {
+                                if (taskModel.Attachments.Any(p => !p.IsImage()))
+                                {
+                                    <div class="filerefs">
+                                        @foreach (var link in taskModel.Attachments.Where(p => !p.IsImage()))
+                                        {
+                                            <div class="filerefcont">
+                                                <img src="/Images/round/attachment.png" /> @Html.ActionLink(link.FileName,
+                     "Download", "File", new { path = link.RealFileName, fileName = link.FileName },
+                     new { @class = "fileref" })
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+
+                            <div class="tasksubscribers">
+                                @if (taskModel.Subscribers.Any())
+                                {
+                                    <span class="tasksubscribersheader">Підписники </span>
+                                    <div>
+                                        @foreach (var sub in taskModel.Subscribers)
+                                        {
+                                            <div class="tasksubscriber">
+                                                <a style="text-decoration: none;"
+                                                   href="@Url.Action("Id", "User", new {Id = sub.Subscriber.Id})">
+                                                    <span class="tasksubscribersuser">@@@sub.Subscriber.Username @(sub.Price == null || sub.Price == 0 ? "" : sub.Price + " грн.")</span>
+                                                </a>
+
+                                                @if (ViewBag.CurrentUser.Id == taskModel.Creator.Id)
                                                 {
-                                                    <img title="Поставити виконавцем" class="checkasmainexecutive" 
-                                                         src="@Url.Content("/Images/yes.png")"/>
+                                                    if (taskModel.Executive == null)
+                                                    {
+                                                        <img title="Поставити виконавцем" class="checkasmainexecutive"
+                                                             src="@Url.Content("/Images/yes.png")" />
+                                                    }
                                                 }
-                                            }
-                                        </div>
-                                    }
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            @if (taskModel.Creator.Id != ViewBag.CurrentUser.Id)
+                            {
+                                <div class="tasksubscribercont" data-bind="foreach: taskSubscribers">
+
+                                    <div data-bind="if: Id == @taskModel.Id">
+                                        <div data-bind="template: { name: 'task-subscriber-template'}"></div>
+                                    </div>
                                 </div>
                             }
-                        </div>
-                        @if (taskModel.Creator.Id != ViewBag.CurrentUser.Id)
-                        {
-                            <div class="tasksubscribercont" data-bind="foreach: taskSubscribers">
+                            @if (taskModel.Executive != null)
+                            {
+                                <div class="taskexecutive">
+                                    <span class="tasksubscribersheader">Виконавець: </span>
+                                    <div>
+                                        <a style="text-decoration: none;" href="@Url.Action("Id", "User", new { Id = taskModel.Executive.Id })"><span class="tasksubscribersuser">@@@taskModel.Executive.Username </span></a>
+                                        @if (taskModel.Creator.Id == ViewBag.CurrentUser.Id)
+                                        {
+                                            <img title="Видалити виконавця" class="uncheckasmainexecutive" src="@Url.Content("/Images/remove.png")" />
+                                        }
+                                    </div>
+                                </div>
 
-                                <div data-bind="if: Id == @taskModel.Id">
-                                    <div data-bind="template: { name: 'task-subscriber-template'}"></div>
-                                </div>
-                            </div>
-                        }
-                        @if (taskModel.Executive != null)
-                        {
-                            <div class="taskexecutive">
-                                <span class="tasksubscribersheader">Виконавець: </span>
-                                <div>
-                                    <a style="text-decoration: none;" href="@Url.Action("Id", "User", new { Id = taskModel.Executive.Id })"><span class="tasksubscribersuser">@@@taskModel.Executive.Username </span></a>
-                                    @if (taskModel.Creator.Id == ViewBag.CurrentUser.Id) {
-                                        <img title="Видалити виконавця" class="uncheckasmainexecutive" src="@Url.Content("/Images/remove.png")"/>
-                                    }
-                                </div>
-                            </div>
-                            
-                        }
-                        <div data-bind="foreach: taskExecutives">
-                            <div data-bind="if: Id == @taskModel.Id">
-                                <div data-bind="template: { name: 'task-executive-template'}"></div>
-                            </div>
-                        </div>
-                        @if (taskModel.Creator.Id != ViewBag.CurrentUser.Id)
-                        {
-                            <div class="taskexecutivecont" data-bind="foreach: taskExecutives">
+                            }
+                            <div data-bind="foreach: taskExecutives">
                                 <div data-bind="if: Id == @taskModel.Id">
                                     <div data-bind="template: { name: 'task-executive-template'}"></div>
                                 </div>
                             </div>
-                        }
-                        <div class="taskcommentscontent">
-                            <div class="taskcommentscontentc">
-                                @if (taskModel.Comments.Count > 0)
-                                {
-                                    foreach (var comment in taskModel.Comments)
+                            @if (taskModel.Creator.Id != ViewBag.CurrentUser.Id)
+                            {
+                                <div class="taskexecutivecont" data-bind="foreach: taskExecutives">
+                                    <div data-bind="if: Id == @taskModel.Id">
+                                        <div data-bind="template: { name: 'task-executive-template'}"></div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="taskcommentscontent">
+                                <div class="taskcommentscontentc">
+                                    @if (taskModel.Comments.Count > 0)
                                     {
-                                        <div class="taskcomment">
-                                            <div class="taskcommentcontent">
-                                                <div class="taskcommentcontenttext">
-                                                    @comment.Content
+                                        foreach (var comment in taskModel.Comments)
+                                        {
+                                            <div class="taskcomment">
+                                                <div class="taskcommentcontent">
+                                                    <div class="taskcommentcontenttext">
+                                                        @comment.Content
+                                                    </div>
+                                                </div>
+                                                <div class="taskcommenttriangle"></div>
+                                                <div class="taskcommentcreator">@@@comment.Creator.Username</div>
+                                                <div>
+                                                    <input class="taskcommentid" type="hidden" value="@comment.Id" />
                                                 </div>
                                             </div>
-                                            <div class="taskcommenttriangle"></div>
-                                            <div class="taskcommentcreator">@@@comment.Creator.Username</div>
-                                            <div>
-                                                <input class="taskcommentid" type="hidden" value="@comment.Id"/>
-                                            </div>
-                                        </div>
+                                        }
                                     }
-                                }
-                                <div data-bind="foreach: newTaskComments">
-                                    <div data-bind="if: Id == @taskModel.Id">
-                                        <div data-bind="template: { name: 'task-comment-template'}"></div>
+                                    <div data-bind="foreach: newTaskComments">
+                                        <div data-bind="if: Id == @taskModel.Id">
+                                            <div data-bind="template: { name: 'task-comment-template'}"></div>
+                                        </div>
+
                                     </div>
-
                                 </div>
-                            </div>
-                            <div class="maininputcomment">
-                                <div class="maininputcommentcontent">
-                                    <textarea name="text" class="maininputcommentinput"></textarea>
-                                    <input type="button" value="Відправити" class="maininputcommentsend"/>
+                                <div class="maininputcomment">
+                                    <div class="maininputcommentcontent">
+                                        <textarea name="text" class="maininputcommentinput"></textarea>
+                                        <input type="button" value="Відправити" class="maininputcommentsend" />
+                                    </div>
+                                    <div class="maininputcommenttriangle"></div>
                                 </div>
-                                <div class="maininputcommenttriangle"></div>
                             </div>
                         </div>
-                    </div>
-                    <div class="tasktriangle"></div>
-                    <div class="taskunder">
-                        <div class="taskcreator">@@@taskModel.Creator.Username</div>
-                        @if (ViewBag.CurrentUser.Id != taskModel.Creator.Id)
-                        {
-                            if (taskModel.Subscribers.Any(u => u.Subscriber.Id == user.Id))
+                        <div class="tasktriangle"></div>
+                        <div class="taskunder">
+                            <div class="taskcreator">@@@taskModel.Creator.Username</div>
+                            @if (ViewBag.CurrentUser.Id != taskModel.Creator.Id)
                             {
-                                <div class="tasksubscribed">
-                                    <img title="Завдання виконано" class="tasksubscribeimg1" src="/Images/solved.png" width="28" />
-                                </div>
+                                if (taskModel.Subscribers.Any(u => u.Subscriber.Id == user.Id))
+                                {
+                                    <div class="tasksubscribed">
+                                        <img title="Завдання виконано" class="tasksubscribeimg1" src="/Images/solved.png" width="28" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="tasksubscribe">
+                                        <img class="tasksubscribeimg" title="Підписатись на виконання" src="/Images/subscribe_to_task.png" width="28" />
+                                    </div>
+                                }
                             }
                             else
                             {
-                                <div class="tasksubscribe">
-                                    <img class="tasksubscribeimg" title="Підписатись на виконання" src="/Images/subscribe_to_task.png" width="28" />
-                                </div>
+                                if (taskModel.Solved == true)
+                                {
+                                    <div class="tasksolved">
+                                        <img title="Завдання виконано" class="tasksubscribeimg" src="/Images/solved.png" width="28" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="tasksolve">
+                                        <img title="Позначити виконаним" class="tasksubscribeimg" src="/Images/subscribe_to_task.png" width="28" />
+                                    </div>
+                                }
                             }
-                        }
-                        else
-                        {
-                            if (taskModel.Solved == true)
-                            {
-                                <div class="tasksolved">
-                                    <img title="Завдання виконано" class="tasksubscribeimg" src="/Images/solved.png" width="28"/>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="tasksolve">
-                                    <img title="Позначити виконаним" class="tasksubscribeimg" src="/Images/subscribe_to_task.png" width="28"/>
-                                </div>
-                            }
-                        }
 
-                        <div class="taskcomments">
-                            <span class="taskcount">@taskModel.Comments.Count</span> <img src="/Images/comments.png" align="middle" width="28"/>
-                        </div>
-                        <div class="tasklikes">
-                            <span class="taskcount">@taskModel.Likes.Count</span> <img src="/Images/like.png" width="28"/>
-                        </div>
+                            <div class="taskcomments">
+                                <span class="taskcount">@taskModel.Comments.Count</span> <img src="/Images/comments.png" align="middle" width="28" />
+                            </div>
+                            <div class="tasklikes">
+                                <span class="taskcount">@taskModel.Likes.Count</span> <img src="/Images/like.png" width="28" />
+                            </div>
 
+                        </div>
+                        <input type="hidden" class="taskid" value="@taskModel.Id" />
                     </div>
-                    <input type="hidden" class="taskid" value="@taskModel.Id"/>
+                }
+
+            </div>
+
+            @if (ViewBag.CurrentUser.Id == ViewBag.UserProfile.Id)
+            {
+
+                <div id="maincreateheader">Створити завдання</div>
+
+                <div id="maininputmsg">
+                    <div id="maininputmsgcontent">
+                        <div id="maininputmsgform">
+                            <div id="taskImages" data-bind="template: { name: 'attachment-image' , foreach: attachmentsImages }">
+                            </div>
+
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Header, new { id = "inputSignInName", @class = "inputSignIn", placeholder = "Заголовок", type = "text" })
+                                @Html.ValidationMessageFor(model => model.Header)
+                            </div>
+
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Price, new { id = "inputSignInPrice", @class = "inputSignIn", placeholder = "Ціна", type = "number" })
+                                @Html.ValidationMessageFor(model => model.Price)
+                            </div>
+
+                            <div class="editor-field">
+                                @Html.TextAreaFor(model => model.Content, new { id = "inputSignInContent", @class = "inputSignIn", placeholder = "Вміст" })
+                                @Html.ValidationMessageFor(model => model.Content)
+                            </div>
+
+                            <div class="editor-field">
+                                <div class="editor-field">
+                                    <div class="slate" id="category">
+                                        @Html.DropDownListFor(model => model.Category, new SelectList(ViewBag.TaskCategories as System.Collections.IEnumerable, "Id", "Name"))
+                                        @Html.ValidationMessageFor(model => model.Category)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="editor-field">
+                                <div class="editor-field">
+                                    <div class="slate" id="subcategory">
+                                        @Html.DropDownListFor(model => model.Subcategory, new SelectList(ViewBag.TaskSubcategories as System.Collections.IEnumerable, "Id", "Name"))
+                                        @Html.ValidationMessageFor(model => model.Subcategory)
+                                    </div>
+                                </div>
+                            </div>
+
+                            @Html.HiddenFor(model => model.Solved, new { value = false })
+
+                            <div id="taskFiles" data-bind="template: { name: 'attachment-file', foreach: attachments }">
+                            </div>
+
+                            <input id="maininputmsgfilesin"
+                                   type="file" name="file" multiple />
+
+                            <input id="btnSubmitTask" type="submit" class="nextstep" value="Створити" />
+
+                        </div>
+                    </div>
+
+                    <div id="maininputmsgtriangle"></div>
+                    <div id="addfilesimg">
+                        <img class="maininputaddphoto" src="/Images/add_photo.png" />
+                        <img class="maininputaddfile" src="/Images/add_file.png" />
+                    </div>
                 </div>
             }
-        
+            <div id="templateTask"></div>
+            <div id="templateTaskComment"></div>
+            <div id="templateSubscriber"></div>
+            <div id="templateExecutive"></div>
+            <div id="templateAttachments"></div>
+            <div id="templateImages"></div>
         </div>
-
-        @if (ViewBag.CurrentUser.Id == ViewBag.UserProfile.Id)
-        {
-
-        <div id="maincreateheader">Створити завдання</div>
-
-        <div id="maininputmsg">
-            <div id="maininputmsgcontent">
-                <div id="maininputmsgform">
-                    <div id="taskImages" data-bind="template: { name: 'attachment-image' , foreach: attachmentsImages }">
-                    </div>
-
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Header, new { id = "inputSignInName", @class = "inputSignIn", placeholder = "Заголовок", type = "text" })
-                        @Html.ValidationMessageFor(model => model.Header)
-                    </div>
-
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Price, new { id = "inputSignInPrice", @class = "inputSignIn", placeholder = "Ціна", type = "number" })
-                        @Html.ValidationMessageFor(model => model.Price)
-                    </div>
-
-                    <div class="editor-field">
-                        @Html.TextAreaFor(model => model.Content, new { id = "inputSignInContent", @class = "inputSignIn", placeholder = "Вміст" })
-                        @Html.ValidationMessageFor(model => model.Content)
-                    </div>
-
-                    <div class="editor-field">
-                        <div class="editor-field">
-                            <div class="slate" id="category">
-                                @Html.DropDownListFor(model => model.Category, new SelectList(ViewBag.TaskCategories as System.Collections.IEnumerable, "Id", "Name"))
-                                @Html.ValidationMessageFor(model => model.Category)
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="editor-field">
-                        <div class="editor-field">
-                            <div class="slate" id="subcategory">
-                                @Html.DropDownListFor(model => model.Subcategory, new SelectList(ViewBag.TaskSubcategories as System.Collections.IEnumerable, "Id", "Name"))
-                                @Html.ValidationMessageFor(model => model.Subcategory)
-                            </div>
-                        </div>
-                    </div>
-
-                    @Html.HiddenFor(model => model.Solved, new { value = false })
-
-                    <div id="taskFiles" data-bind="template: { name: 'attachment-file', foreach: attachments }">
-                    </div>
-
-                    <input id="maininputmsgfilesin"
-                        type="file" name="file" multiple />
-
-                    <input id="btnSubmitTask" type="submit" class="nextstep" value="Створити"/>
-                   
-                </div>
-            </div>
-        
-            <div id="maininputmsgtriangle"></div>
-            <div id="addfilesimg">
-                <img class="maininputaddphoto" src="/Images/add_photo.png" />
-                <img class="maininputaddfile" src="/Images/add_file.png" />
-            </div>
-        </div>
-        }
-        <div id="templateTask"></div>
-        <div id="templateTaskComment"></div>
-        <div id="templateSubscriber"></div>
-        <div id="templateExecutive"></div>
-        <div id="templateAttachments"></div>
-        <div id="templateImages"></div>
-    </div>
     </div>
 </body>
 </html>

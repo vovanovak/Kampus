@@ -10,7 +10,7 @@ namespace Kampus.Application
 {
     public static class ApplicationDependencyInjectionExtensions
     {
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        public static IServiceCollection AddApplicationDependencies(this IServiceCollection services)
         {
             return services.AddServices().AddMappers();
         }
