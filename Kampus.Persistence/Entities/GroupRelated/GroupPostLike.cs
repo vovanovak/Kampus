@@ -1,12 +1,6 @@
-﻿using Kampus.Persistence.Entities;
-using Kampus.Persistence.Entities.UserRelated;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Kampus.Persistence.Entities.UserRelated;
 
-namespace Kampus.Entities
+namespace Kampus.Persistence.Entities.GroupRelated
 {
     public class GroupPostLike : DbEntity
     {

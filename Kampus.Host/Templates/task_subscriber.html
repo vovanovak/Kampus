@@ -1,0 +1,9 @@
+﻿<script type="text/html" id="task-subscriber-template">
+    <div class="tasksubscriber">
+        <a style="text-decoration: none;" data-bind="attr: { href: '/User/Id/' + Subscriber.Id}">
+            <span class="tasksubscribersuser" data-bind="text: '@' + Subscriber.Username + ' ' + ((Subscriber.Price == null) ? ' ' : Subscriber.Price + ' грн.')">
+                
+            </span>
+        </a>
+    </div>
+</script>

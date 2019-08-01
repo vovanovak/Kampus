@@ -1,6 +1,5 @@
 ﻿using Kampus.Application.Exceptions;
 using Kampus.Application.Mappers;
-using Kampus.Entities;
 using Kampus.Models;
 using Kampus.Persistence.Contexts;
 using Kampus.Persistence.Entities.AttachmentsRelated;

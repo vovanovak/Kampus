@@ -1,0 +1,64 @@
+﻿<script type="text/html" id="wallpost-template">
+    <div class="post">
+        <div class="postcontent">
+            <div data-bind="if: Images.length > 0">
+                <div data-bind="foreach: Images">
+                    <img class="attachImg" data-bind="attr: { src: '/Files/' + RealFileName }" />
+                </div>
+            </div>
+            <div class="postcontenttext" data-bind="text: Content">
+                
+            </div>
+            <div data-bind="if: Files.length > 0">
+                <div class="filerefs" data-bind="foreach: Files">
+                    <div class="filerefcont">
+                        <img src="/Images/round/attachment.png" /> <a data-bind="text: FileName, attr: { href: '/Files/' + RealFileName, class: 'fileref' }"> </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="postcommentshid">
+            <div class="postcommentscontent" data-bind="foreach: {data: Comments, as: 'comment'}">
+                
+                <div class="postcomment">
+                    <div class="postcommentcontent">
+                        <div class="postcommentcontenttext" data-bind="text: comment.Content">
+
+                        </div>
+                    </div>
+                    <div class="postcommenttriangle"></div>
+                    <div class="postcommentcreator" data-bind="text: '@' + comment.Creator.Username"></div>
+                    <div>
+                        <input class="postcommentid" type="hidden" data-bind="attr: { value: comment.Id }" />
+                    </div>
+                </div>
+            </div>
+            <div class="maininputcomment">
+                <div class="maininputcommentcontent">
+                    <textarea name="text" class="maininputcommentinput"></textarea>
+
+                    <input type="button" value="Відправити" class="maininputcommentsend" />
+                </div>
+                <div class="maininputcommenttriangle"></div>
+            </div>
+        </div>
+       
+        <div class="postunder">
+            <div class="postcreator" data-bind="text: '@' + Sender"></div>
+            <div class="postbuttons">
+                <div class="postdelete" data-bind="if: IsDeletable"  style="margin-left: -25px;">
+                    <img src="/Images/bin.png" width="28" style="margin-left: 0px"  />
+                </div>
+
+                <div class="postcomments">
+                    <span class="postcount" data-bind="text: Comments.length"></span> <img src="/Images/comments.png" align="middle" width="28" />
+                </div>
+                <div class="postlikes">
+                    <span class="postcount" data-bind="text: Likes"></span> <img src="/Images/like.png" width="28" />
+                </div>
+            </div>
+            <div class="posttriangle"></div>
+        </div>
+        <input type="hidden" class="postid" data-bind="attr: { value: Id }" />
+    </div>
+</script>

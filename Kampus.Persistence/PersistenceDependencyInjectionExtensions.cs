@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Kampus.Persistence.Contexts;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kampus.Persistence
 {
@@ -6,6 +9,14 @@ namespace Kampus.Persistence
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services)
         {
+            services.AddDbContext<KampusContext>((sp, options) =>
+            {
+                var configuration = sp.GetService<IConfiguration>();
+                var connectionString = configuration.GetConnectionString("Sql"); 
+
+                options.UseSqlServer(connectionString);
+            });
+
             return services;
         }
     }

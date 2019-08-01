@@ -1,7 +1,6 @@
-﻿using Kampus.Persistence.Entities;
-using Kampus.Persistence.Entities.UserRelated;
+﻿using Kampus.Persistence.Entities.UserRelated;
 
-namespace Kampus.Entities
+namespace Kampus.Persistence.Entities.TaskRelated
 {
     public class TaskSubscriber : DbEntity
     {

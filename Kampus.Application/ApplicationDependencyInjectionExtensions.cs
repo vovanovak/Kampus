@@ -18,7 +18,7 @@ namespace Kampus.Application
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<IUserConnectionsService, UserConnectionsService>();
-            services.AddScoped<IUserProfileRecoveryService, IUserProfileRecoveryService>();
+            services.AddScoped<IUserProfileRecoveryService, UserProfileRecoveryService>();
             services.AddScoped<IUserSearchService, UserSearchService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICityService, CityService>();

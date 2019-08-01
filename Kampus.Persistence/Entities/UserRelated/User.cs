@@ -4,7 +4,7 @@ using Kampus.Persistence.Entities.TaskRelated;
 using Kampus.Persistence.Entities.WallPostRelated;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kampus.Persistence.Entities.UserRelated
 {

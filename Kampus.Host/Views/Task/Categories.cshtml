@@ -1,0 +1,54 @@
+﻿
+@using Kampus.Models
+@model dynamic
+
+@{
+    Layout = null;
+    List<TaskCategoryModel> categories = ViewBag.TaskCategories;
+    List<TaskSubcatModel> subcategories = ViewBag.TaskSubcategories;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link rel="SHORTCUT ICON" href="/Images/favicon.png" type="image/x-icon"/> <title>Категорії</title>
+
+    <link rel="stylesheet" href="~/Content/null_style.css" />
+    <link rel="stylesheet" href="~/Content/tasks_style.css" />
+    <link rel="stylesheet" href="~/Content/task_categories.css"/>
+    <link rel="stylesheet" href="~/Content/notifications_style.css"/>
+    <link rel="stylesheet" href="~/Content/toolbar_style.css" />
+
+    @Scripts.Render("~/bundles/jquery")
+    <script src="~/Scripts/My/notification.js"></script>
+</head>
+<body>
+<div>
+    @Html.Partial("Toolbar")
+    <div id="main">
+        <div id="mainheader">Категорії</div>
+        <div id="categories">
+            @foreach (var category in categories)
+            {
+                <div class="category">
+                    <div class="categoryheader">
+                        <a class="categoryheadertxt" href="@Url.Action("SearchTasks", new {category = category.Id, subcategory = -1})">@category.Name</a>
+                    </div>
+                    <div class="subcategories">
+                        @foreach (var subcategory in subcategories.Where(s => s.TaskCategoryId == category.Id).ToList())
+                        {
+                            <div class="subcategory">
+                                <div class="subcategoryheader">
+                                    <a class="subcategoryheadertxt" href="@Url.Action("SearchTasks", new {category = category.Id, subcategory = subcategory.Id})">@subcategory.Name</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>   
+</div>
+</body>
+</html>
