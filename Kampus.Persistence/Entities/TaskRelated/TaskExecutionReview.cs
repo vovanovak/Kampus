@@ -2,12 +2,14 @@
 
 namespace Kampus.Persistence.Entities.TaskRelated
 {
-    public class TaskExecutionReview : DbEntity
+    public class TaskExecutionReview
     {
-        public int? TaskId { get; set; }
-        public Task Task { get; set; }
+        public int TaskExecutionReviewId { get; set; }
 
-        public int? ExecutorId { get; set; }
+        public int TaskId { get; set; }
+        public TaskEntry TaskEntry { get; set; }
+
+        public int ExecutorId { get; set; }
         public User Executor { get; set; }
 
         public float? Rating { get; set; }

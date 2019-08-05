@@ -25,11 +25,11 @@ namespace Kampus.Application.Services.Impl
             _taskMapper = taskMapper;
         }
 
-        private IQueryable<Task> GetTasks()
+        private IQueryable<TaskEntry> GetTasks()
         {
             return _context.Tasks
                 .Include(t => t.TaskCat)
-                .Include(t => t.TaskSubcat)
+                .Include(t => t.TaskSubcategory)
                 .Include(t => t.Creator)
                 .Include(t => t.Executive)
                 .Include(t => t.TaskLikes)
@@ -58,7 +58,7 @@ namespace Kampus.Application.Services.Impl
 
         public List<TaskSubcatModel> GetSubcategories(int taskCategoryId)
         {
-            return _context.TaskSubcats.Where(s => s.TaskCategoryId == taskCategoryId)
+            return _context.TaskSubcategories.Where(s => s.TaskCategoryId == taskCategoryId)
                            .Select(c => new TaskSubcatModel()
                            {
                                Id = c.Id,
@@ -91,15 +91,15 @@ namespace Kampus.Application.Services.Impl
 
         public void CheckTaskAsHidden(int taskId)
         {
-            Task task = _context.Tasks.First(t => t.Id == taskId);
+            TaskEntry taskEntry = _context.Tasks.First(t => t.Id == taskId);
 
-            if (task.Hide == null)
+            if (taskEntry.Hide == null)
             {
-                task.Hide = true;
+                taskEntry.Hide = true;
             }
             else
             {
-                task.Hide = !task.Hide;
+                taskEntry.Hide = !taskEntry.Hide;
             }
 
             _context.SaveChanges();
@@ -107,13 +107,13 @@ namespace Kampus.Application.Services.Impl
 
         public List<TaskCommentModel> GetNewTaskComments(int taskId, int? taskCommentId)
         {
-            Task task = _context.Tasks.First(p => p.Id == taskId);
+            TaskEntry taskEntry = _context.Tasks.First(p => p.Id == taskId);
 
             if (taskCommentId == null)
             {
-                if (task.TaskComments.Any())
+                if (taskEntry.TaskComments.Any())
                 {
-                    return task.TaskComments.Select(c => new TaskCommentModel()
+                    return taskEntry.TaskComments.Select(c => new TaskCommentModel()
                     {
                         Id = c.Id,
                         CreationTime = c.CreationTime,
@@ -134,9 +134,9 @@ namespace Kampus.Application.Services.Impl
             }
             else
             {
-                TaskComment comment = task.TaskComments.First(c => c.Id == taskCommentId);
+                TaskComment comment = taskEntry.TaskComments.First(c => c.Id == taskCommentId);
 
-                List<TaskComment> comments = task.TaskComments.Where(p => comment.Id < p.Id).ToList();
+                List<TaskComment> comments = taskEntry.TaskComments.Where(p => comment.Id < p.Id).ToList();
 
                 if (comments.Any())
                 {
@@ -173,18 +173,18 @@ namespace Kampus.Application.Services.Impl
             {
                 TaskLike like = new TaskLike();
 
-                like.Task = _context.Tasks.First(p => p.Id == taskId);
-                like.TaskId = like.Task.Id;
+                like.TaskEntry = _context.Tasks.First(p => p.Id == taskId);
+                like.TaskId = like.TaskEntry.Id;
 
                 like.Liker = user;
                 like.LikerId = user.Id;
 
                 _context.TaskLikes.Add(like);
 
-                if (like.Task.Creator.Id != user.Id)
+                if (like.TaskEntry.Creator.Id != user.Id)
                 {
                     Notification notification = Notification.From(DateTime.Now, NotificationType.TaskLike,
-                        like.Task.Creator, user, "/Tasks/Id/" + taskId, "@" + user.Username + " оцінив ваше завдання");
+                        like.TaskEntry.Creator, user, "/Tasks/Id/" + taskId, "@" + user.Username + " оцінив ваше завдання");
                     _context.Notifications.Add(notification);
                 }
                 _context.SaveChanges();
@@ -201,15 +201,15 @@ namespace Kampus.Application.Services.Impl
 
             comment.Content = text;
             comment.TaskId = taskId;
-            comment.Task = _context.Tasks.First(p => p.Id == taskId);
+            comment.TaskEntry = _context.Tasks.First(p => p.Id == taskId);
             comment.Creator = user;
             comment.CreatorId = user.Id;
             comment.CreationTime = DateTime.Now;
 
-            if (comment.Task.CreatorId != user.Id)
+            if (comment.TaskEntry.CreatorId != user.Id)
             {
                 Notification notification = Notification.From(DateTime.Now, NotificationType.TaskComment,
-                    user, comment.Task.Creator, "/Tasks/Id/" + taskId, "@" + user.Username + " коментував ваше завдання");
+                    user, comment.TaskEntry.Creator, "/Tasks/Id/" + taskId, "@" + user.Username + " коментував ваше завдання");
 
                 _context.Notifications.Add(notification);
             }
@@ -235,35 +235,35 @@ namespace Kampus.Application.Services.Impl
 
         public void CheckTaskAsSolved(int taskId)
         {
-            Task task = _context.Tasks.First(t => t.Id == taskId);
-            if (task.Solved == true)
+            TaskEntry taskEntry = _context.Tasks.First(t => t.Id == taskId);
+            if (taskEntry.Solved == true)
             {
-                task.Solved = false;
-                task.Executive = null;
-                task.ExecutiveId = null;
+                taskEntry.Solved = false;
+                taskEntry.Executive = null;
+                taskEntry.ExecutiveId = null;
             }
             else
             {
-                task.Solved = true;
+                taskEntry.Solved = true;
 
-                if (task.Executive != null)
+                if (taskEntry.Executive != null)
                 {
-                    if (task.Executive.Achievements == null)
-                        task.Executive.Achievements = new List<TaskCategory>();
+                    if (taskEntry.Executive.Achievements == null)
+                        taskEntry.Executive.Achievements = new List<TaskCategory>();
 
-                    if (!task.Executive.Achievements.Any(t => t.Name == task.TaskCat.Name) &&
-                        _context.Tasks.Count(t => t.Solved == true && t.Executive.Id == task.Executive.Id) >= 3)
+                    if (!taskEntry.Executive.Achievements.Any(t => t.Name == taskEntry.TaskCat.Name) &&
+                        _context.Tasks.Count(t => t.Solved == true && t.Executive.Id == taskEntry.Executive.Id) >= 3)
                     {
-                        task.Executive.Achievements.Add(task.TaskCat);
+                        taskEntry.Executive.Achievements.Add(taskEntry.TaskCat);
 
                         Notification notificationAchievement = Notification.From(DateTime.Now, NotificationType.Achievement,
-                            task.Creator, task.Executive, "/Tasks/Id/" + task.Id, "Новий бейдж в категорії \"" + task.TaskCat.Name + "\"");
+                            taskEntry.Creator, taskEntry.Executive, "/Tasks/Id/" + taskEntry.Id, "Новий бейдж в категорії \"" + taskEntry.TaskCat.Name + "\"");
 
                         _context.Notifications.Add(notificationAchievement);
                     }
 
                     Notification notificationSolved = Notification.From(DateTime.Now, NotificationType.Solved,
-                        task.Creator, task.Executive, "/Tasks/Id/" + task.Id, "Завдання виконане!");
+                        taskEntry.Creator, taskEntry.Executive, "/Tasks/Id/" + taskEntry.Id, "Завдання виконане!");
 
                     _context.Notifications.Add(notificationSolved);
                 }
@@ -274,24 +274,24 @@ namespace Kampus.Application.Services.Impl
 
         public void CheckAsTaskMainExecutive(int taskId, string username)
         {
-            Task task = _context.Tasks.First(t => t.Id == taskId);
+            TaskEntry taskEntry = _context.Tasks.First(t => t.Id == taskId);
             User user = _context.Users.First(u => u.Username == username);
 
-            task.TaskSubscribers.RemoveAll(t => t.Subscriber == user);
+            taskEntry.TaskSubscribers.RemoveAll(t => t.Subscriber == user);
 
-            if (task.ExecutiveId == user.Id)
+            if (taskEntry.ExecutiveId == user.Id)
             {
-                task.Executive = null;
-                task.ExecutiveId = null;
+                taskEntry.Executive = null;
+                taskEntry.ExecutiveId = null;
             }
             else
             {
-                task.Executive = user;
-                task.ExecutiveId = user.Id;
+                taskEntry.Executive = user;
+                taskEntry.ExecutiveId = user.Id;
             }
 
             Notification notification = Notification.From(DateTime.Now, NotificationType.CheckedAsTaskExecutive,
-                task.Creator, user, "/Tasks/Id/" + task.Id, "@" + task.Creator.Username + " поставив вас виконавцем завдання");
+                taskEntry.Creator, user, "/Tasks/Id/" + taskEntry.Id, "@" + taskEntry.Creator.Username + " поставив вас виконавцем завдання");
 
             _context.Notifications.Add(notification);
 
@@ -300,11 +300,11 @@ namespace Kampus.Application.Services.Impl
 
         public void RemoveTaskExecutive(int taskId)
         {
-            Task task = _context.Tasks.First(t => t.Id == taskId);
+            TaskEntry taskEntry = _context.Tasks.First(t => t.Id == taskId);
 
-            task.TaskSubscribers.RemoveAll(t => t.SubscriberId == task.ExecutiveId);
-            task.ExecutiveId = null;
-            task.Executive = null;
+            taskEntry.TaskSubscribers.RemoveAll(t => t.SubscriberId == taskEntry.ExecutiveId);
+            taskEntry.ExecutiveId = null;
+            taskEntry.Executive = null;
 
             _context.SaveChanges();
         }
@@ -313,30 +313,30 @@ namespace Kampus.Application.Services.Impl
         {
             User sender = _context.Users.First(u => u.Id == senderId);
 
-            Task task = _context.Tasks.First(t => t.Id == taskId);
+            TaskEntry taskEntry = _context.Tasks.First(t => t.Id == taskId);
 
-            if (task.Executive != null)
+            if (taskEntry.Executive != null)
             {
-                if (task.Executive.Id == sender.Id)
+                if (taskEntry.Executive.Id == sender.Id)
                     throw new SameUserException();
             }
 
-            if (sender.Id == task.Creator.Id)
+            if (sender.Id == taskEntry.Creator.Id)
                 throw new SameUserException();
 
-            if (task.TaskSubscribers == null)
-                task.TaskSubscribers = new List<TaskSubscriber>();
+            if (taskEntry.TaskSubscribers == null)
+                taskEntry.TaskSubscribers = new List<TaskSubscriber>();
             else
             {
-                if (task.TaskSubscribers.Any(t => t.SubscriberId == senderId))
+                if (taskEntry.TaskSubscribers.Any(t => t.SubscriberId == senderId))
                     throw new SameUserException();
             }
 
-            task.TaskSubscribers.RemoveAll(s => s.SubscriberId == senderId);
-            task.TaskSubscribers.Add(new TaskSubscriber() { Subscriber = sender, Price = taskPrice });
+            taskEntry.TaskSubscribers.RemoveAll(s => s.SubscriberId == senderId);
+            taskEntry.TaskSubscribers.Add(new TaskSubscriber() { Subscriber = sender, Price = taskPrice });
 
             Notification notification = Notification.From(DateTime.Now, NotificationType.TaskSubscribed,
-                sender, task.Creator, "/Tasks/Id/" + task.Id, " підписався на виконання завдання");
+                sender, taskEntry.Creator, "/Tasks/Id/" + taskEntry.Id, " підписався на виконання завдання");
 
             _context.Notifications.Add(notification);
             _context.SaveChanges();
@@ -392,12 +392,12 @@ namespace Kampus.Application.Services.Impl
         public void AddExecutionReview(ExecutionReviewModel model)
         {
             TaskExecutionReview review = new TaskExecutionReview();
-            Task task = _context.Tasks.First(t => t.Id == model.TaskId);
+            TaskEntry taskEntry = _context.Tasks.First(t => t.Id == model.TaskId);
 
             review.TaskId = model.TaskId;
-            review.Task = task;
-            review.ExecutorId = task.ExecutiveId;
-            review.Executor = task.Executive;
+            review.TaskEntry = taskEntry;
+            review.ExecutorId = taskEntry.ExecutiveId;
+            review.Executor = taskEntry.Executive;
 
             review.Rating = model.Rating;
             review.Review = model.Review;
@@ -429,21 +429,21 @@ namespace Kampus.Application.Services.Impl
         public TaskModel CreateTask(int userId, string header, string content, int price,
             int category, int subcategory, List<FileModel> attachments)
         {
-            Task task = new Task();
+            TaskEntry taskEntry = new TaskEntry();
 
-            task.Header = header;
-            task.Content = content;
-            task.Price = price;
-            task.Solved = false;
-            task.CreatorId = userId;
-            task.Creator = _context.Users.First(u => u.Id == userId);
-            task.TaskCategoryId = category;
-            task.TaskCat = _context.TaskCategories.First(c => c.Id == category);
-            task.TaskSubcatId = subcategory;
-            task.TaskSubcat = _context.TaskSubcats.First(s => s.Id == subcategory);
-            task.TaskLikes = new List<TaskLike>();
-            task.TaskComments = new List<TaskComment>();
-            task.TaskSubscribers = new List<TaskSubscriber>();
+            taskEntry.Header = header;
+            taskEntry.Content = content;
+            taskEntry.Price = price;
+            taskEntry.Solved = false;
+            taskEntry.CreatorId = userId;
+            taskEntry.Creator = _context.Users.First(u => u.Id == userId);
+            taskEntry.TaskCategoryId = category;
+            taskEntry.TaskCat = _context.TaskCategories.First(c => c.Id == category);
+            taskEntry.TaskSubcategoryId = subcategory;
+            taskEntry.TaskSubcategory = _context.TaskSubcategories.First(s => s.Id == subcategory);
+            taskEntry.TaskLikes = new List<TaskLike>();
+            taskEntry.TaskComments = new List<TaskComment>();
+            taskEntry.TaskSubscribers = new List<TaskSubscriber>();
 
             if (attachments != null)
             {
@@ -457,14 +457,14 @@ namespace Kampus.Application.Services.Impl
                     files.Add(file);
                     _context.Files.Add(file);
                 }
-                task.Attachments = files;
+                taskEntry.Attachments = files;
             }
             else
             {
-                task.Attachments = new List<File>();
+                taskEntry.Attachments = new List<File>();
             }
 
-            _context.Tasks.Add(task);
+            _context.Tasks.Add(taskEntry);
             _context.SaveChanges();
 
             return GetTasks().Where(t => t.Id == _context.Tasks.Max(t1 => t1.Id)).Select(_taskMapper.Map).First();
@@ -472,7 +472,7 @@ namespace Kampus.Application.Services.Impl
 
         public int? GetTaskExecutiveId(int taskId)
         {
-            Task t = _context.Tasks.First(t1 => t1.Id == taskId);
+            TaskEntry t = _context.Tasks.First(t1 => t1.Id == taskId);
 
             if (t.Executive == null)
                 return -1;

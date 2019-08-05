@@ -68,7 +68,7 @@ namespace Kampus.Application.Services.Users.Impl
 
 
                 if (dbEntity.StudentDetails.Faculty == null)
-                    dbEntity.StudentDetails.Faculty = new UniversityFaculty();
+                    dbEntity.StudentDetails.Faculty = new Faculty();
                 dbEntity.StudentDetails.Faculty = _context.Faculties.First(u => u.Name == model.UniversityFaculty && u.UniversityId == dbEntity.StudentDetails.University.Id);
             }
         }

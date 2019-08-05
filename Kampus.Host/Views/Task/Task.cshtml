@@ -78,7 +78,7 @@
                         }
                     }
 
-                    <div class="tasksubscribers">
+                    <div class="taskEntrysubscribers">
 
                         @if (taskModel.Subscribers.Any())
                         {
@@ -86,7 +86,7 @@
                             <div>
                                 @foreach (var sub in taskModel.Subscribers)
                                 {
-                                    <div class="tasksubscriber">
+                                    <div class="taskEntrysubscriber">
                                         <a style="text-decoration: none;" href="@Url.Action("Id", "User", new {Id = sub.Subscriber.Id})"><span class="tasksubscribersuser">@@@sub.Subscriber.Username @(sub.Price == null || sub.Price == 0 ? "" : sub.Price.ToString() + " грн.")</span></a>
                                         @if (taskModel.Executive == null && taskModel.Creator.Id == user.Id)
                                         {
@@ -97,15 +97,15 @@
                             </div>
                         }
                     </div>
-                    <div class="tasksubscribercont" data-bind="foreach: taskSubscribers">
+                    <div class="taskEntrysubscribercont" data-bind="foreach: taskEntrySubscribers">
 
                         <div data-bind="if: Id == @taskModel.Id">
-                            <div data-bind="template: { name: 'task-subscriber-template'}"></div>
+                            <div data-bind="template: { name: 'taskEntry-subscriber-template'}"></div>
                         </div>
                     </div>
                     @if (taskModel.Executive != null)
                     {
-                        <div class="taskexecutive">
+                        <div class="taskEntryexecutive">
                             <span class="tasksubscribersheader">Виконавець: </span>
                             <div>
                                 <a style="text-decoration: none;" href="@Url.Action("Id", "User", new {Id = taskModel.Executive.Id})"><span class="tasksubscribersuser">@@@taskModel.Executive.Username </span></a>
@@ -116,13 +116,13 @@
                             </div>
                         </div>
                     }
-                    <div data-bind="foreach: taskExecutives">
+                    <div data-bind="foreach: taskEntryExecutives">
                         <div data-bind="if: Id == @taskModel.Id">
-                            <div data-bind="template: { name: 'task-executive-template'}"></div>
+                            <div data-bind="template: { name: 'taskEntry-executive-template'}"></div>
                         </div>
                     </div>
-                    <div class="taskcommentscontent">
-                        <div class="taskcommentscontentc">
+                    <div class="taskEntrycommentscontent">
+                        <div class="taskEntrycommentscontentc">
                             @if (taskModel.Comments.Count > 0)
                             {
                                 foreach (var comment in taskModel.Comments)
@@ -136,14 +136,14 @@
                                         <div class="taskcommenttriangle"></div>
                                         <div class="taskcommentcreator">@@@comment.Creator.Username</div>
                                         <div>
-                                            <input class="taskcommentid" type="hidden" value="@comment.Id" />
+                                            <input class="taskEntrycommentid" type="hidden" value="@comment.Id" />
                                         </div>
                                     </div>
                                 }
                             }
-                            <div data-bind="foreach: newTaskComments">
+                            <div data-bind="foreach: newTaskEntryComments">
                                 <div data-bind="if: Id == @taskModel.Id">
-                                    <div data-bind="template: { name: 'task-comment-template'}"></div>
+                                    <div data-bind="template: { name: 'taskEntry-comment-template'}"></div>
                                 </div>
 
                             </div>
@@ -158,7 +158,7 @@
                     </div>
                 </div>
                 <div class="tasktriangle"></div>
-                <div class="taskunder">
+                <div class="taskEntryunder">
                     <div class="taskcreator">@@@taskModel.Creator.Username</div>
 
                     @if (taskModel.Creator.Id == user.Id)
@@ -166,13 +166,13 @@
                         if (taskModel.Solved == false || taskModel.Solved == null)
                         {
                             <div class="tasksubscribe">
-                                <img title="Позначити виконаним" class="tasksubscribeimg" src="/Images/subscribe_to_task.png" width="28" />
+                                <img title="Позначити виконаним" class="taskEntrysubscribeimg" src="/Images/subscribe_to_task.png" width="28" />
                             </div>
                         }
                         else
                         {
-                            <div class="tasksubscribe1">
-                                <img title="Завдання виконано" class="tasksubscribeimg" src="/Images/solved.png" width="28" />
+                            <div class="taskEntrysubscribe1">
+                                <img title="Завдання виконано" class="taskEntrysubscribeimg" src="/Images/solved.png" width="28" />
                             </div>
                         }
                     }
@@ -180,14 +180,14 @@
                     {
                         if (taskModel.Subscribers.Any(u => u.Subscriber.Id == user.Id))
                         {
-                            <div class="tasksubscribe1">
-                                <img class="tasksubscribeimg" title="Підписатись на виконання" src="/Images/subscribe_to_task.png" width="28" />
+                            <div class="taskEntrysubscribe1">
+                                <img class="taskEntrysubscribeimg" title="Підписатись на виконання" src="/Images/subscribe_to_task.png" width="28" />
                             </div>
                         }
                         else
                         {
                             <div class="tasksubscribe2">
-                                <img class="tasksubscribeimg" title="Підписатись на виконання" src="/Images/subscribe_to_task.png" width="28" />
+                                <img class="taskEntrysubscribeimg" title="Підписатись на виконання" src="/Images/subscribe_to_task.png" width="28" />
                             </div>
                         }
 
@@ -202,7 +202,7 @@
                     </div>
 
                 </div>
-                <input type="hidden" class="taskid" value="@taskModel.Id" />
+                <input type="hidden" class="taskEntryid" value="@taskModel.Id" />
             </div>
         </div>
         <div id="templateTask"></div>

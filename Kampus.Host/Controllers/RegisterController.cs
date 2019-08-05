@@ -76,7 +76,7 @@ namespace Kampus.Host.Controllers
         {
             if (ModelState.IsValidField("DateOfBirth") &&
                 ModelState.IsValidField("UniversityName") &&
-                ModelState.IsValidField("UniversityFaculty") &&
+                ModelState.IsValidField("Faculty") &&
                 ModelState.IsValidField("City") &&
                 ModelState.IsValidField("UniversityCourse"))
             {

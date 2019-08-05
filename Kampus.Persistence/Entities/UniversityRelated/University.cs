@@ -2,10 +2,11 @@
 
 namespace Kampus.Persistence.Entities.UniversityRelated
 {
-    public class University : DbEntity
+    public class University
     {
+        public int UniversityId { get; set; }
         public string Name { get; set; }
 
-        public virtual List<UniversityFaculty> Faculties { get; set; }
+        public List<Faculty> Faculties { get; set; }
     }
 }

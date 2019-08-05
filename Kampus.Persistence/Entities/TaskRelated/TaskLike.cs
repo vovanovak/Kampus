@@ -2,12 +2,12 @@
 
 namespace Kampus.Persistence.Entities.TaskRelated
 {
-    public class TaskLike : DbEntity
+    public class TaskLike
     {
-        public int? TaskId { get; set; }
-        public virtual Task Task { get; set; }
+        public int TaskId { get; set; }
+        public TaskEntry TaskEntry { get; set; }
 
-        public int? LikerId { get; set; }
-        public virtual User Liker { get; set; }
+        public int LikerId { get; set; }
+        public User Liker { get; set; }
     }
 }

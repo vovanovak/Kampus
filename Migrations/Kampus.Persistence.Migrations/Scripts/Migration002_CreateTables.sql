@@ -61,6 +61,7 @@ CREATE TABLE [dbo].[Users]
 	[NotificationsLastChecked] DATETIME2 NOT NULL,
 	
 	[StudentDetailsId] INT FOREIGN KEY REFERENCES [dbo].[StudentDetails]([StudentDetailsId]),
+	[UserPermissionId] INT FOREIGN KEY REFERENCES [dbo].[UserPermissions]([UserPermissionId]),
 	[RoleId] INT FOREIGN KEY REFERENCES [dbo].[StudentDetails]([StudentDetailsId]),
 	[CityId] INT FOREIGN KEY REFERENCES [dbo].[Cities]([CityId]),
 )

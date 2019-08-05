@@ -3,15 +3,16 @@ using System;
 
 namespace Kampus.Persistence.Entities.WallPostRelated
 {
-    public class WallPostComment : DbEntity
+    public class WallPostComment
     {
+        public int WallPostCommentId { get; set; }
         public string Content { get; set; }
 
         public int CreatorId { get; set; }
-        public virtual User Creator { get; set; }
+        public User Creator { get; set; }
 
         public int WallPostId { get; set; }
-        public virtual WallPost WallPost { get; set; }
+        public WallPost WallPost { get; set; }
 
         public DateTime CreationTime { get; set; }
     }

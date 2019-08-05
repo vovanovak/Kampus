@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 namespace Kampus.Persistence.Entities.WallPostRelated
 {
-    public class WallPost : DbEntity
+    public class WallPost
     {
+        public int WallPostId { get; set; }
         public string Content { get; set; }
 
         public int? OwnerId { get; set; }

@@ -25,7 +25,7 @@ namespace Kampus.Application.Services.Impl
 
         private IQueryable<WallPost> GetAllPostsWithRelatedEntities()
         {
-            return _context.UserPosts
+            return _context.WallPosts
                 .Include(p => p.Likes)
                     .ThenInclude((WallPostLike l) => l.Liker)
                 .Include(p => p.Comments)
@@ -54,7 +54,7 @@ namespace Kampus.Application.Services.Impl
 
         public IReadOnlyList<WallPostCommentModel> GetNewWallPostComments(int postId, int? postCommentId)
         {
-            WallPost post = _context.UserPosts.First(p => p.Id == postId);
+            WallPost post = _context.WallPosts.First(p => p.Id == postId);
 
             if (postCommentId == null)
             {
@@ -113,13 +113,13 @@ namespace Kampus.Application.Services.Impl
         {
             User user = _context.Users.First(u => u.Id == userId);
 
-            WallPost post = _context.UserPosts.First(p => p.Id == postId);
+            WallPost post = _context.WallPosts.First(p => p.Id == postId);
 
-            if (_context.UserPostLikes.Any(l => l.LikerId == user.Id && l.WallPostId == postId))
+            if (_context.WallPostLikes.Any(l => l.LikerId == user.Id && l.WallPostId == postId))
             {
                 List<WallPostLike> likes =
-                    _context.UserPostLikes.Where(l => l.LikerId == user.Id && l.WallPostId == postId).ToList();
-                _context.UserPostLikes.RemoveRange(likes);
+                    _context.WallPostLikes.Where(l => l.LikerId == user.Id && l.WallPostId == postId).ToList();
+                _context.WallPostLikes.RemoveRange(likes);
                 _context.SaveChanges();
                 return LikeResult.Unliked;
             }
@@ -133,7 +133,7 @@ namespace Kampus.Application.Services.Impl
                 like.Liker = user;
                 like.LikerId = user.Id;
 
-                _context.UserPostLikes.Add(like);
+                _context.WallPostLikes.Add(like);
 
                 if (post.Owner.Id != user.Id)
                 {
@@ -152,7 +152,7 @@ namespace Kampus.Application.Services.Impl
 
             comment.Content = text;
             comment.WallPostId = postId;
-            comment.WallPost = _context.UserPosts.First(p => p.Id == postId);
+            comment.WallPost = _context.WallPosts.First(p => p.Id == postId);
             comment.Creator = _context.Users.First(u => u.Id == userId);
             comment.CreationTime = DateTime.Now;
 
@@ -163,10 +163,10 @@ namespace Kampus.Application.Services.Impl
                 _context.Notifications.Add(notification);
             }
 
-            _context.UserPostComments.Add(comment);
+            _context.WallPostComments.Add(comment);
             _context.SaveChanges();
 
-            return _context.UserPostComments.Where(c => c.WallPostId == postId &&
+            return _context.WallPostComments.Where(c => c.WallPostId == postId &&
                    c.CreationTime == comment.CreationTime).Select(dbComment => new WallPostCommentModel()
                    {
                        Id = dbComment.Id,
@@ -202,7 +202,7 @@ namespace Kampus.Application.Services.Impl
 
             var dbEntity = _wallPostMapper.Map(model);
             _context.Files.AddRange(dbEntity.Attachments);
-            _context.UserPosts.Add(dbEntity);
+            _context.WallPosts.Add(dbEntity);
 
             _context.SaveChanges();
 
@@ -220,13 +220,13 @@ namespace Kampus.Application.Services.Impl
 
         public int GetLastWallPostId()
         {
-            return _context.UserPosts.Last().Id;
+            return _context.WallPosts.Last().Id;
         }
 
         public void Delete(int wallPostId)
         {
-            var wallPost = _context.UserPosts.Single(p => p.Id == wallPostId);
-            _context.UserPosts.Remove(wallPost);
+            var wallPost = _context.WallPosts.Single(p => p.Id == wallPostId);
+            _context.WallPosts.Remove(wallPost);
             _context.SaveChanges();
         }
     }

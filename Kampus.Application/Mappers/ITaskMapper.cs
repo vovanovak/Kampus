@@ -5,6 +5,6 @@ namespace Kampus.Application.Mappers
 {
     public interface ITaskMapper
     {
-        TaskModel Map(Task task);
+        TaskModel Map(TaskEntry taskEntry);
     }
 }

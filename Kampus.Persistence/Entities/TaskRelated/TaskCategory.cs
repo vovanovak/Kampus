@@ -2,11 +2,13 @@
 
 namespace Kampus.Persistence.Entities.TaskRelated
 {
-    public class TaskCategory : DbEntity
+    public class TaskCategory
     {
+        public int TaskCategoryId { get; set; }
+
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public virtual List<TaskSubcat> Subcategories { get; set; }
+        public virtual List<TaskSubcategory> Subcategories { get; set; }
     }
 }
