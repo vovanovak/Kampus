@@ -13,7 +13,7 @@ namespace Kampus.Persistence.Contexts
     {
         public DbSet<User> Users { get; set; }
         public DbSet<UserRecovery> Recoveries { get; set; }
-        public DbSet<ExecutionReview> Reviews { get; set; }
+        public DbSet<TaskExecutionReview> Reviews { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<StudentDetails> StudentDetails { get; set; }

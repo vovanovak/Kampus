@@ -391,7 +391,7 @@ namespace Kampus.Application.Services.Impl
 
         public void AddExecutionReview(ExecutionReviewModel model)
         {
-            ExecutionReview review = new ExecutionReview();
+            TaskExecutionReview review = new TaskExecutionReview();
             Task task = _context.Tasks.First(t => t.Id == model.TaskId);
 
             review.TaskId = model.TaskId;

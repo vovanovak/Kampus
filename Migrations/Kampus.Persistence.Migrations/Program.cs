@@ -28,7 +28,9 @@ namespace Kampus.Persistence.Migrations
                 .ConfigureRunner(rb => rb
                     .AddSqlServer()
                     .WithGlobalConnectionString(GetConnectionString())
-                    .ScanIn(typeof(Program).Assembly))
+                    .ScanIn(typeof(Program).Assembly)
+                        .For.Migrations()
+                        .For.EmbeddedResources())
                 .AddLogging(lb => lb.AddFluentMigratorConsole());
 
             return services.BuildServiceProvider();

@@ -2,7 +2,7 @@
 
 namespace Kampus.Persistence.Entities.TaskRelated
 {
-    public class ExecutionReview : DbEntity
+    public class TaskExecutionReview : DbEntity
     {
         public int? TaskId { get; set; }
         public Task Task { get; set; }
