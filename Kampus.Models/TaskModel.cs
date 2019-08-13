@@ -14,7 +14,7 @@ namespace Kampus.Models
         [Required(ErrorMessage = "Please provide content of task", AllowEmptyStrings = false)]
         public string Content { get; set; }
 
-        public int? Price { get; set; }
+        public decimal? Price { get; set; }
 
         public UserShortModel Creator { get; set; }
         public UserShortModel Executive { get; set; }

@@ -206,6 +206,7 @@ GO
 
 CREATE TABLE [dbo].[TaskSubscribers]
 (
+    [TaskSubscriberId] INT PRIMARY KEY IDENTITY(1, 1),
 	[TaskId] INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Tasks]([TaskId]),
 	[SubscriberId] INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users]([UserId]),
 	[Price] MONEY NOT NULL,

@@ -7,17 +7,17 @@ namespace Kampus.Application.Mappers.Impl
     {
         public NotificationModel Map(Notification notification)
         {
-            return new NotificationModel()
+            return new NotificationModel
             {
-                Id = notification.Id,
+                Id = notification.NotificationId,
                 Date = notification.Date,
                 Link = notification.Link,
                 Message = notification.Message,
                 Type = (int)notification.Type,
                 Seen = notification.Seen,
                 SeenDate = notification.SeenDate,
-                Receiver = new UserShortModel() { Id = notification.Receiver.Id, Username = notification.Receiver.Username, Avatar = notification.Receiver.Avatar },
-                Sender = new UserShortModel() { Id = notification.Sender.Id, Username = notification.Sender.Username, Avatar = notification.Sender.Avatar }
+                Receiver = new UserShortModel(notification.Receiver.UserId, notification.Receiver.Username, notification.Receiver.Avatar),
+                Sender = new UserShortModel(notification.Sender.UserId, notification.Sender.Username, notification.Sender.Avatar)
             };
         }
     }

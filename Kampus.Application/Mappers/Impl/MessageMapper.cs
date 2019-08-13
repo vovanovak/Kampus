@@ -10,16 +10,16 @@ namespace Kampus.Application.Mappers.Impl
         {
             return new MessageModel()
             {
-                Id = message.Id,
+                Id = message.MessageId,
                 Content = message.Content,
                 CreationDate = message.CreationDate,
-                Receiver = new UserShortModel() { Id = message.Receiver.Id, Username = message.Receiver.Username, Avatar = message.Receiver.Avatar },
-                Sender = new UserShortModel() { Id = message.Sender.Id, Username = message.Sender.Username, Avatar = message.Sender.Avatar },
-                Attachments = message.Attachments.Select(f => new FileModel()
+                Receiver = new UserShortModel(message.Receiver.UserId, message.Receiver.Username, message.Receiver.Avatar),
+                Sender = new UserShortModel(message.Sender.UserId, message.Sender.Username, message.Sender.Avatar),
+                Attachments = message.Attachments.Select(mf => new FileModel()
                 {
-                    Id = f.Id,
-                    RealFileName = f.RealFileName,
-                    FileName = f.FileName
+                    Id = mf.File.FileId,
+                    RealFileName = mf.File.RealFileName,
+                    FileName = mf.File.FileName
                 }).ToList()
             };
         }

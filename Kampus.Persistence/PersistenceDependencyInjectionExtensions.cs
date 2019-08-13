@@ -16,6 +16,7 @@ namespace Kampus.Persistence
 
                 options.UseSqlServer(connectionString);
             });
+            
 
             return services;
         }

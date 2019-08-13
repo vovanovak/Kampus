@@ -17,6 +17,6 @@ namespace Kampus.Persistence.Entities.WallPostRelated
 
         public virtual List<WallPostComment> Comments { get; set; }
         public virtual List<WallPostLike> Likes { get; set; }
-        public virtual List<File> Attachments { get; set; }
+        public virtual List<WallPostFile> Attachments { get; set; }
     }
 }

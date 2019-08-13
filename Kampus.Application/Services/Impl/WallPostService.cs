@@ -27,9 +27,9 @@ namespace Kampus.Application.Services.Impl
         {
             return _context.WallPosts
                 .Include(p => p.Likes)
-                    .ThenInclude((WallPostLike l) => l.Liker)
+                    .ThenInclude(l => l.Liker)
                 .Include(p => p.Comments)
-                    .ThenInclude((WallPostComment c) => c.Creator)
+                    .ThenInclude(c => c.Creator)
                 .Include(p => p.Attachments);
         }
 
@@ -37,7 +37,7 @@ namespace Kampus.Application.Services.Impl
         {
             List<WallPostModel> models = GetAllPostsWithRelatedEntities()
                 .Where(p => p.OwnerId == userId)
-                .OrderByDescending(p => p.Id)
+                .OrderByDescending(p => p.WallPostId)
                 .Select(_wallPostMapper.Map)
                 .ToList();
 
@@ -47,14 +47,14 @@ namespace Kampus.Application.Services.Impl
         public IReadOnlyList<WallPostModel> GetLastWallPosts(int ownerId, int senderId, int lastPostId)
         {
             return GetAllPostsWithRelatedEntities()
-                .Where(p => p.OwnerId == ownerId && p.SenderId != senderId && p.Id > lastPostId)
+                .Where(p => p.OwnerId == ownerId && p.SenderId != senderId && p.WallPostId > lastPostId)
                 .Select(_wallPostMapper.Map)
                 .ToList();
         }
 
         public IReadOnlyList<WallPostCommentModel> GetNewWallPostComments(int postId, int? postCommentId)
         {
-            WallPost post = _context.WallPosts.First(p => p.Id == postId);
+            var post = _context.WallPosts.First(p => p.WallPostId == postId);
 
             if (postCommentId == null)
             {
@@ -64,11 +64,11 @@ namespace Kampus.Application.Services.Impl
                     {
                         List<WallPostCommentModel> comments = post.Comments.Select(c => new WallPostCommentModel()
                         {
-                            Id = c.Id,
+                            Id = c.WallPostId,
                             CreationTime = c.CreationTime,
                             Content = c.Content,
                             WallPostId = c.WallPostId,
-                            Creator = new UserShortModel() { Id = c.Creator.Id, Username = c.Creator.Username, Avatar = c.Creator.Avatar }
+                            Creator = new UserShortModel() { Id = c.Creator.UserId, Username = c.Creator.Username, Avatar = c.Creator.Avatar }
                         }).ToList();
 
                         return comments;
@@ -86,64 +86,62 @@ namespace Kampus.Application.Services.Impl
             else
             {
 
-                WallPostComment comment = post.Comments.First(c => c.Id == postCommentId);
+                var comment = post.Comments.First(c => c.WallPostCommentId == postCommentId);
 
                 List<WallPostComment> comments =
-                    post.Comments.Where(p => comment.CreationTime.Ticks < p.CreationTime.Ticks && comment.Id != p.Id).ToList();
+                    post.Comments.Where(p => comment.CreationTime.Ticks < p.CreationTime.Ticks && comment.WallPostCommentId != p.WallPostCommentId).ToList();
 
                 if (comments.Any())
                 {
-                    return comments.Select(c => new WallPostCommentModel()
+                    return comments.Select(c => new WallPostCommentModel
                     {
-                        Id = c.Id,
+                        Id = c.WallPostCommentId,
                         CreationTime = c.CreationTime,
                         Content = c.Content,
                         WallPostId = c.WallPostId,
-                        Creator = UserShortModel.From(c.Creator.Id, c.Creator.Username, c.Creator.Avatar)
+                        Creator = new UserShortModel(c.Creator.UserId, c.Creator.Username, c.Creator.Avatar)
                     }).ToList();
                 }
-                else
-                {
-                    return new List<WallPostCommentModel>();
-                }
+
+                return new List<WallPostCommentModel>();
             }
         }
 
         public LikeResult LikeWallPost(int userId, int postId)
         {
-            User user = _context.Users.First(u => u.Id == userId);
+            var user = _context.Users.First(u => u.UserId == userId);
 
-            WallPost post = _context.WallPosts.First(p => p.Id == postId);
+            var post = _context.WallPosts.First(p => p.WallPostId == postId);
 
-            if (_context.WallPostLikes.Any(l => l.LikerId == user.Id && l.WallPostId == postId))
+            if (_context.WallPostLikes.Any(l => l.LikerId == user.UserId && l.WallPostId == postId))
             {
                 List<WallPostLike> likes =
-                    _context.WallPostLikes.Where(l => l.LikerId == user.Id && l.WallPostId == postId).ToList();
+                    _context.WallPostLikes.Where(l => l.LikerId == user.UserId && l.WallPostId == postId).ToList();
                 _context.WallPostLikes.RemoveRange(likes);
                 _context.SaveChanges();
                 return LikeResult.Unliked;
             }
-            else
+
+            var like = new WallPostLike
             {
-                WallPostLike like = new WallPostLike();
+                WallPost = post,
+                WallPostId = post.WallPostId,
+                Liker = user,
+                LikerId = user.UserId
+            };
 
-                like.WallPost = post;
-                like.WallPostId = post.Id;
+            _context.WallPostLikes.Add(like);
 
-                like.Liker = user;
-                like.LikerId = user.Id;
-
-                _context.WallPostLikes.Add(like);
-
-                if (post.Owner.Id != user.Id)
-                {
-                    Notification notification = Notification.From(DateTime.Now, NotificationType.WallPostWritten,
-                        user, post.Owner, "@" + user.Username + " оцінив запис на вашій стіні", "/Home/Post/" + postId);
-                    _context.Notifications.Add(notification);
-                }
-                _context.SaveChanges();
-                return LikeResult.Liked;
+            if (post.Owner.UserId != user.UserId)
+            {
+                var notification = Notification.From(DateTime.Now, NotificationType.WallPostWritten,
+                    user, post.Owner, "@" + user.Username + " оцінив запис на вашій стіні", "/Home/Post/" + postId);
+                _context.Notifications.Add(notification);
             }
+
+            _context.SaveChanges();
+
+            return LikeResult.Liked;
         }
 
         public WallPostCommentModel WritePostComment(int userId, int postId, string text)
@@ -152,13 +150,13 @@ namespace Kampus.Application.Services.Impl
 
             comment.Content = text;
             comment.WallPostId = postId;
-            comment.WallPost = _context.WallPosts.First(p => p.Id == postId);
-            comment.Creator = _context.Users.First(u => u.Id == userId);
+            comment.WallPost = _context.WallPosts.First(p => p.WallPostId == postId);
+            comment.Creator = _context.Users.First(u => u.UserId == userId);
             comment.CreationTime = DateTime.Now;
 
             if (comment.WallPost.OwnerId != userId)
             {
-                Notification notification = Notification.From(DateTime.Now, NotificationType.WallPostWritten,
+                var notification = Notification.From(DateTime.Now, NotificationType.WallPostWritten,
                     comment.Creator, comment.WallPost.Owner, "/Home/Post/" + postId, " коментував запис на вашій стіні");
                 _context.Notifications.Add(notification);
             }
@@ -166,31 +164,35 @@ namespace Kampus.Application.Services.Impl
             _context.WallPostComments.Add(comment);
             _context.SaveChanges();
 
-            return _context.WallPostComments.Where(c => c.WallPostId == postId &&
-                   c.CreationTime == comment.CreationTime).Select(dbComment => new WallPostCommentModel()
-                   {
-                       Id = dbComment.Id,
-                       CreationTime = dbComment.CreationTime,
-                       Content = dbComment.Content,
-                       WallPostId = dbComment.WallPostId,
-                       Creator = new UserShortModel() { Id = dbComment.Creator.Id, Username = dbComment.Creator.Username, Avatar = dbComment.Creator.Avatar }
-                   }).OrderByDescending(c => c.Id).Take(1).Single();
+            return _context.WallPostComments
+                .Where(c => c.WallPostId == postId && c.CreationTime == comment.CreationTime)
+                .Select(dbComment => new WallPostCommentModel
+                {
+                    Id = dbComment.WallPostCommentId,
+                    CreationTime = dbComment.CreationTime,
+                    Content = dbComment.Content,
+                    WallPostId = dbComment.WallPostId,
+                    Creator = new UserShortModel(dbComment.Creator.UserId, dbComment.Creator.Username,
+                        dbComment.Creator.Avatar)
+                })
+                .OrderByDescending(c => c.Id)
+                .First();
         }
 
         public WallPostModel WriteWallPost(int userId, int senderId, string content, List<FileModel> attachments)
         {
-            User sender = _context.Users.First(u => u.Id == senderId);
-            User user = _context.Users.First(u => u.Id == userId);
+            var sender = _context.Users.First(u => u.UserId == senderId);
+            var user = _context.Users.First(u => u.UserId == userId);
 
             if (attachments == null)
                 attachments = new List<FileModel>();
 
-            WallPostModel model = new WallPostModel()
+            var model = new WallPostModel
             {
                 Content = content,
-                Sender = new UserShortModel() { Id = sender.Id, Avatar = sender.Avatar, Username = sender.Username },
-                Owner = new UserShortModel() { Id = user.Id, Avatar = user.Avatar, Username = user.Username },
-                Attachments = attachments.Select(f => new FileModel()
+                Sender = new UserShortModel(sender.UserId, sender.Avatar, sender.Username),
+                Owner = new UserShortModel(user.UserId, user.Avatar, user.Username),
+                Attachments = attachments.Select(f => new FileModel
                 {
                     Id = f.Id,
                     RealFileName = f.RealFileName,
@@ -201,14 +203,14 @@ namespace Kampus.Application.Services.Impl
             };
 
             var dbEntity = _wallPostMapper.Map(model);
-            _context.Files.AddRange(dbEntity.Attachments);
+            _context.Files.AddRange(dbEntity.Attachments.Select(wf => wf.File));
             _context.WallPosts.Add(dbEntity);
 
             _context.SaveChanges();
 
             if (userId != senderId)
             {
-                Notification notification = Notification.From(DateTime.Now, NotificationType.WallPostWritten,
+                var notification = new Notification(DateTime.Now, NotificationType.WallPostWritten,
                     sender, user, " написав на вашій стіні: \"" + content + "\"", "/Home");
 
                 _context.Notifications.Add(notification);
@@ -220,12 +222,12 @@ namespace Kampus.Application.Services.Impl
 
         public int GetLastWallPostId()
         {
-            return _context.WallPosts.Last().Id;
+            return _context.WallPosts.Last().WallPostId;
         }
 
         public void Delete(int wallPostId)
         {
-            var wallPost = _context.WallPosts.Single(p => p.Id == wallPostId);
+            var wallPost = _context.WallPosts.Single(p => p.WallPostId == wallPostId);
             _context.WallPosts.Remove(wallPost);
             _context.SaveChanges();
         }

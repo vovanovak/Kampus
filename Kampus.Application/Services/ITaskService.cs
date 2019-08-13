@@ -10,7 +10,7 @@ namespace Kampus.Application.Services
         List<TaskModel> GetUserTasks(int userId);
         List<TaskModel> GetUserSolvedTasks(int userId);
         List<TaskCategoryModel> GetTaskCategories();
-        List<TaskSubcatModel> GetSubcategories(int TaskCategoryId);
+        List<TaskSubcategoryModel> GetSubcategories(int TaskCategoryId);
         List<TaskModel> GetUserSubscribedTasks(int userId);
         List<TaskModel> GetUserExecutiveTasks(int userId);
         TaskModel GetById(int taskId);

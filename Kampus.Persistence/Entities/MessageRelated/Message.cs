@@ -19,6 +19,6 @@ namespace Kampus.Persistence.Entities.MessageRelated
 
         public DateTime CreationDate { get; set; }
 
-        public virtual List<File> Attachments { get; set; }
+        public virtual List<MessageFile> Attachments { get; set; }
     }
 }

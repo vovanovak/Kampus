@@ -30,7 +30,7 @@ namespace Kampus.Application.Services.Users.Impl
             {
                 UserRecovery recovery = new UserRecovery();
                 recovery.User = user;
-                recovery.UserId = user.Id;
+                recovery.UserId = user.UserId;
                 recovery.HashString = (DateTime.Now.Ticks.ToString() + username + email + path).GetEncodedHash();
 
                 SendRecoveryLetter(recovery, path);

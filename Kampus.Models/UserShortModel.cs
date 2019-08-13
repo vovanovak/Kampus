@@ -10,21 +10,16 @@
         {
         }
 
+        public UserShortModel(int? id, string username, string avatar)
+        {
+            Id = id;
+            Username = username;
+            Avatar = avatar;
+        }
+
         public static UserShortModel From(UserModel model)
         {
-            UserShortModel u = new UserShortModel();
-            u.Id = model.Id;
-            u.Username = model.Username;
-            u.Avatar = model.Avatar;
-            return u;
-        }
-        public static UserShortModel From(int? id, string username, string avatar)
-        {
-            UserShortModel u = new UserShortModel();
-            u.Id = id;
-            u.Username = username;
-            u.Avatar = avatar;
-            return u;
+            return new UserShortModel(model.Id, model.Username, model.Avatar);
         }
     }
 }

@@ -8,6 +8,7 @@ using Kampus.Persistence.Entities.UserRelated;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kampus.Application.Services.Impl
 {
@@ -22,19 +23,24 @@ namespace Kampus.Application.Services.Impl
             _messageMapper = messageMapper;
         }
 
+        private IQueryable<Message> GetMessages()
+        {
+            return _context.Messages.Include(m => m.Attachments).ThenInclude(mf => mf.File);
+        }
+
         public List<MessageModel> GetUserMessages(int userId)
         {
-            return
-                _context.Messages.Where(m => m.SenderId == userId ||
-                    m.ReceiverId == userId).Select(_messageMapper.Map).ToList();
+            return GetMessages().Where(m => m.SenderId == userId || m.ReceiverId == userId)
+                .Select(_messageMapper.Map)
+                .ToList();
         }
 
         public void WriteMessage(int senderId, int receiverId, string text, List<FileModel> attachments)
         {
             Message msg = new Message();
 
-            User sender = _context.Users.First(u => u.Id == senderId);
-            User receiver = _context.Users.First(u => u.Id == receiverId);
+            User sender = _context.Users.First(u => u.UserId == senderId);
+            User receiver = _context.Users.First(u => u.UserId == receiverId);
 
             msg.Sender = sender;
             msg.SenderId = senderId;
@@ -57,10 +63,11 @@ namespace Kampus.Application.Services.Impl
                     files.Add(file);
                     _context.Files.Add(file);
                 }
-                msg.Attachments = files;
+
+                msg.Attachments = files.Select(f => new MessageFile { File = f, Message = msg }).ToList();
             }
 
-            Notification notification = Notification.From(DateTime.Now, NotificationType.Message,
+            var notification = new Notification(DateTime.Now, NotificationType.Message,
                 sender, receiver, "/Home/Conversation?username=" + receiver.Username, " надіслав вам повідомлення");
 
             _context.Notifications.Add(notification);
@@ -71,50 +78,48 @@ namespace Kampus.Application.Services.Impl
 
         public List<MessageModel> GetNewMessages(int senderId, int receiverId, int lastmsgid)
         {
-            DateTime time = _context.Messages.FirstOrDefault(m1 => m1.Id == lastmsgid).CreationDate;
+            var time = _context.Messages.First(m1 => m1.MessageId == lastmsgid).CreationDate;
 
-            List<MessageModel> messages = _context.Messages.Where(m =>
-                ((m.SenderId == senderId && m.ReceiverId == receiverId) ||
-                (m.SenderId == receiverId && m.ReceiverId == senderId)) &&
-                m.CreationDate > time).Select(_messageMapper.Map).ToList();
+            var messages = GetMessages().Where(m => (m.SenderId == senderId && m.ReceiverId == receiverId ||
+                                                     m.SenderId == receiverId && m.ReceiverId == senderId) &&
+                                                    m.CreationDate > time)
+                .Select(_messageMapper.Map)
+                .ToList();
 
             return messages;
         }
 
         public List<MessageModel> GetMessages(int senderId, int receiverId)
         {
-            List<MessageModel> messages =
-                _context.Messages.Where(m => (m.SenderId == senderId &&
-                    m.ReceiverId == receiverId) ||
-                    (m.ReceiverId == senderId &&
-                    m.SenderId == receiverId))
-                    .Select(_messageMapper.Map)
-                    .ToList();
+            var messages = GetMessages().Where(m => m.SenderId == senderId && m.ReceiverId == receiverId ||
+                                                    m.ReceiverId == senderId && m.SenderId == receiverId)
+                .Select(_messageMapper.Map)
+                .ToList();
 
             return messages;
         }
 
         public List<UserShortModel> GetUserMessangers(int userId)
         {
-            List<Message> messages = _context.Messages.Where(m => m.SenderId == userId || m.ReceiverId == userId).ToList();
-            List<UserShortModel> messangers = new List<UserShortModel>();
+            var messages = _context.Messages.Where(m => m.SenderId == userId || m.ReceiverId == userId).ToList();
+            var messangers = new List<UserShortModel>();
 
-            foreach (Message message in messages)
+            foreach (var message in messages)
             {
                 if (messangers.Count(m => m.Id == message.SenderId) == 0)
                 {
                     if (message.Sender == null)
-                        message.Sender = _context.Users.First(u => message.SenderId == u.Id);
+                        message.Sender = _context.Users.First(u => message.SenderId == u.UserId);
 
-                    messangers.Add(UserShortModel.From(message.Sender.Id, message.Sender.Username, message.Sender.Avatar));
+                    messangers.Add(new UserShortModel(message.Sender.UserId, message.Sender.Username, message.Sender.Avatar));
                 }
 
                 if (messangers.Count(m => m.Id == message.ReceiverId) == 0)
                 {
                     if (message.Receiver == null)
-                        message.Receiver = _context.Users.First(u => message.ReceiverId == u.Id);
+                        message.Receiver = _context.Users.First(u => message.ReceiverId == u.UserId);
 
-                    messangers.Add(UserShortModel.From(message.Receiver.Id, message.Receiver.Username, message.Receiver.Avatar));
+                    messangers.Add(new UserShortModel(message.Receiver.UserId, message.Receiver.Username, message.Receiver.Avatar));
                 }
             }
 
@@ -124,14 +129,9 @@ namespace Kampus.Application.Services.Impl
         public Dictionary<UserShortModel, MessageModel> GetNewUserMessangers(int senderId)
         {
             return _context.Messages.Where(m => m.ReceiverId == senderId &&
-                    !_context.Messages.Any(m1 => m1.ReceiverId == senderId))
-                    .Select(_messageMapper.Map)
-                    .Select(m => new
-                    {
-                        Key = m.Sender,
-                        Value = m
-                    })
-                    .ToDictionary(pair => pair.Key, pair => pair.Value);
+                                                !_context.Messages.Any(m1 => m1.ReceiverId == senderId))
+                .Select(_messageMapper.Map)
+                .ToDictionary(m => m.Sender, m => m);
         }
     }
 }

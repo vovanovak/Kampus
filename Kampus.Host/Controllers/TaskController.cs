@@ -35,7 +35,7 @@ namespace Kampus.Host.Controllers
             List<TaskCategoryModel> categories = _taskService.GetTaskCategories();
             ViewBag.TaskCategories = categories;
 
-            List<TaskSubcatModel> subcats = _taskService.GetSubcategories(categories.ElementAt(0).Id);
+            List<TaskSubcategoryModel> subcats = _taskService.GetSubcategories(categories.ElementAt(0).Id);
             ViewBag.TaskSubcategories = subcats;
 
             ViewBag.SearchTask = _searchTask;
@@ -46,7 +46,7 @@ namespace Kampus.Host.Controllers
             List<TaskCategoryModel> categories = _taskService.GetTaskCategories();
             ViewBag.TaskCategories = categories;
 
-            List<TaskSubcatModel> subcats = _taskService.GetSubcategories(categories.ElementAt(0).Id);
+            List<TaskSubcategoryModel> subcats = _taskService.GetSubcategories(categories.ElementAt(0).Id);
             ViewBag.TaskSubcategories = subcats;
 
             ViewBag.SubscribedTasks = _taskService.GetUserSubscribedTasks(userId);
@@ -120,7 +120,7 @@ namespace Kampus.Host.Controllers
             List<TaskCategoryModel> categories = _taskService.GetTaskCategories().DistinctBy(c => c.Name).ToList();
             ViewBag.TaskCategories = categories;
 
-            List<TaskSubcatModel> subcats = new List<TaskSubcatModel>();
+            List<TaskSubcategoryModel> subcats = new List<TaskSubcategoryModel>();
 
             foreach (var category in categories)
             {
@@ -266,7 +266,7 @@ namespace Kampus.Host.Controllers
         {
             List<TaskCategoryModel> categories = _taskService.GetTaskCategories();
             TaskCategoryModel category = categories.First(c => c.Name == name);
-            List<TaskSubcatModel> subcats = _taskService.GetSubcategories(category.Id);
+            List<TaskSubcategoryModel> subcats = _taskService.GetSubcategories(category.Id);
             return JsonConvert.SerializeObject(subcats.Select(f => new { f.Id, f.Name }).ToArray());
         }
 

@@ -29,7 +29,7 @@ namespace Kampus.Application.Services.Users.Impl
 
         public UserModel GetById(int userId)
         {
-            return _userMapper.Map(_context.Users.Single(u => u.Id == userId));
+            return _userMapper.Map(_context.Users.Single(u => u.UserId == userId));
         }
 
         public UserModel GetByUsername(string username)
@@ -69,7 +69,7 @@ namespace Kampus.Application.Services.Users.Impl
 
                 if (dbEntity.StudentDetails.Faculty == null)
                     dbEntity.StudentDetails.Faculty = new Faculty();
-                dbEntity.StudentDetails.Faculty = _context.Faculties.First(u => u.Name == model.UniversityFaculty && u.UniversityId == dbEntity.StudentDetails.University.Id);
+                dbEntity.StudentDetails.Faculty = _context.Faculties.First(u => u.Name == model.UniversityFaculty && u.UniversityId == dbEntity.StudentDetails.University.UniversityId);
             }
         }
 
@@ -102,14 +102,14 @@ namespace Kampus.Application.Services.Users.Impl
 
         public void SetAvatar(int userId, string path)
         {
-            User user = _context.Users.First(u => u.Id == userId);
+            User user = _context.Users.First(u => u.UserId == userId);
             user.Avatar = path;
             _context.SaveChanges();
         }
 
         public void ChangePassword(int userId, string oldPassword, string newPassword, string newPasswordConfirm)
         {
-            User user = _context.Users.First(u => u.Id == userId);
+            User user = _context.Users.First(u => u.UserId == userId);
             if (user.Password == oldPassword)
             {
                 if (newPassword == newPasswordConfirm)
@@ -122,14 +122,14 @@ namespace Kampus.Application.Services.Users.Impl
 
         public void ChangeStatus(int userId, string status)
         {
-            User user = _context.Users.First(u => u.Id == userId);
+            User user = _context.Users.First(u => u.UserId == userId);
             user.Status = status;
             _context.SaveChanges();
         }
 
         public void ChangeStudentInfo(int userId, string university, string faculty, int course)
         {
-            User user = _context.Users.First(u => u.Id == userId);
+            User user = _context.Users.First(u => u.UserId == userId);
             if (user.StudentDetails == null)
                 user.StudentDetails = new StudentDetails();
 
@@ -142,7 +142,7 @@ namespace Kampus.Application.Services.Users.Impl
 
         public void ChangeCity(int userId, string city)
         {
-            User user = _context.Users.First(u => u.Id == userId);
+            User user = _context.Users.First(u => u.UserId == userId);
             user.City = _context.Cities.First(c => c.Name == city);
             _context.SaveChanges();
         }

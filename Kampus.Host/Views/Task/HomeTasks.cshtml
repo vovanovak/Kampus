@@ -76,14 +76,14 @@
                             <option value="-1"></option>
                             @if (search.SubcategoryId == null)
                             {
-                                foreach (TaskSubcatModel category in ViewBag.TaskSubcategories)
+                                foreach (TaskSubcategoryModel category in ViewBag.TaskSubcategories)
                                 {
                                     <option value="@category.Id">@category.Name</option>
                                 }
                             }
                             else
                             {
-                                foreach (TaskSubcatModel category in ViewBag.TaskSubcategories)
+                                foreach (TaskSubcategoryModel category in ViewBag.TaskSubcategories)
                                 {
                                     if (category.Id == search.SubcategoryId)
                                     {

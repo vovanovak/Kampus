@@ -88,7 +88,7 @@ namespace Kampus.Application.Services.Users.Impl
             return users.Any()
                 ? users.Select(u => new UserModel()
                 {
-                    Id = u.Id,
+                    Id = u.UserId,
                     Username = u.Username,
                     Email = u.Email,
                     Password = u.Password,

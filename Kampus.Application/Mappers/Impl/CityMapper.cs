@@ -5,6 +5,6 @@ namespace Kampus.Application.Mappers.Impl
 {
     internal class CityMapper : ICityMapper
     {
-        public CityModel Map(City city) => new CityModel() { Id = city.Id, Name = city.Name };
+        public CityModel Map(City city) => new CityModel(city.CityId, city.Name);
     }
 }

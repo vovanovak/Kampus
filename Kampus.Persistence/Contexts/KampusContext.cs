@@ -12,6 +12,9 @@ namespace Kampus.Persistence.Contexts
     public class KampusContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Friend> Friends { get; set; }
+        public DbSet<Subscriber> Subscribers { get; set; }
+        public DbSet<BlackList> BlackLists { get; set; }
         public DbSet<UserRecovery> Recoveries { get; set; }
         public DbSet<TaskExecutionReview> Reviews { get; set; }
         public DbSet<Role> UserRoles { get; set; }
@@ -32,6 +35,9 @@ namespace Kampus.Persistence.Contexts
         public DbSet<UserPermissions> Permissions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<File> Files { get; set; }
+        public DbSet<MessageFile> MessageFiles { get; set; }
+        public DbSet<TaskFile> TaskFiles { get; set; }
+        public DbSet<WallPostFile> WallPostFiles { get; set; }
 
         public KampusContext() : base()
         {

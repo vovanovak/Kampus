@@ -8,11 +8,13 @@ namespace Kampus.Application.Mappers.Impl
     {
         public UniversityModel Map(University university)
         {
-            return new UniversityModel()
+            return new UniversityModel
             {
-                Id = university.Id,
+                Id = university.UniversityId,
                 Name = university.Name,
-                Faculties = university.Faculties.Select(f => new UniversityFacultyModel() { Id = f.Id, Name = f.Name }).ToList()
+                Faculties = university.Faculties
+                    .Select(f => new UniversityFacultyModel { Id = f.FacultyId, Name = f.Name })
+                    .ToList()
             };
         }
     }

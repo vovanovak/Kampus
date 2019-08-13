@@ -246,7 +246,7 @@ namespace Kampus.Host.Controllers
         public ActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Index", "SignIn");
+            return RedirectToAction("SignIn", "Main");
         }
         #endregion
     }

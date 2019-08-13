@@ -32,6 +32,6 @@ namespace Kampus.Persistence.Entities.TaskRelated
         public virtual List<TaskLike> TaskLikes { get; set; }
         public virtual List<TaskComment> TaskComments { get; set; }
 
-        public virtual List<File> Attachments { get; set; }
+        public virtual List<TaskFile> Attachments { get; set; }
     }
 }

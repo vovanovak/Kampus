@@ -22,18 +22,16 @@ namespace Kampus.Application.Services.Impl
 
         public IReadOnlyList<NotificationModel> GetNewNotifications(int userId)
         {
-            User user = _context.Users.First(u => u.Id == userId);
+            var user = _context.Users.First(u => u.UserId == userId);
 
-            int count = _context.Notifications.Count();
+            var notifications = _context.Notifications
+                .Where(n => n.ReceiverId == userId)
+                .Select(_notificationMapper.Map)
+                .ToList();
 
-            List<NotificationModel> notifications =
-                _context.Notifications.Where(n => n.ReceiverId == userId).Select(_notificationMapper.Map).ToList();
+            var sec = TimeSpan.TicksPerSecond * 2;
 
-            long sec = TimeSpan.TicksPerSecond * 2;
-
-            notifications.RemoveAll(n => ((n.SeenDate != null)
-                ? DateTime.Now.Ticks - n.SeenDate.Value.Ticks >= sec
-                : false));
+            notifications.RemoveAll(n => n.SeenDate != null && DateTime.Now.Ticks - n.SeenDate.Value.Ticks >= sec);
 
             user.NotificationsLastChecked = DateTime.Now;
 
@@ -42,7 +40,7 @@ namespace Kampus.Application.Services.Impl
 
         public void SetNotificationSeen(int notificationId)
         {
-            Notification notification = _context.Notifications.First(n => n.Id == notificationId);
+            var notification = _context.Notifications.Single(n => n.NotificationId == notificationId);
             notification.Seen = true;
             notification.SeenDate = DateTime.Now;
             _context.SaveChanges();
@@ -50,8 +48,11 @@ namespace Kampus.Application.Services.Impl
 
         public void ViewUnseenNotifications(int userId)
         {
-            List<Notification> notifications = _context.Notifications.Where(n => n.ReceiverId == userId &&
-                n.Seen == false && n.SeenDate == null).ToList();
+            var notifications = _context.Notifications
+                .Where(n => n.ReceiverId == userId &&
+                            n.Seen == false &&
+                            n.SeenDate == null)
+                .ToList();
 
             foreach (var n in notifications)
             {

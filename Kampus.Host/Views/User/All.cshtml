@@ -25,7 +25,7 @@
     <div id="wrapper">
         <div id="aside">
             <div id="tasksearchform">
-                @using (Html.BeginForm("Search", "User", FormMethod.Get))
+                @using (Html.BeginForm("SearchUsers", "User", FormMethod.Get))
                 {
                     <input type="text" class="inputSignIn" id="searchrequest"
                            value="@(search.Request ?? "")" name="request" placeholder="Пошук" />

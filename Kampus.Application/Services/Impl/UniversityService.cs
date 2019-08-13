@@ -21,7 +21,7 @@ namespace Kampus.Application.Services.Impl
 
         public int GetFacultyId(int universityId, string name)
         {
-            return _context.Faculties.First(f => f.UniversityId == universityId && f.Name == name).Id;
+            return _context.Faculties.First(f => f.UniversityId == universityId && f.Name == name).FacultyId;
         }
 
         public List<UniversityModel> GetUniversities()
@@ -31,8 +31,8 @@ namespace Kampus.Application.Services.Impl
 
         public string GetUniversityFaculties(string name)
         {
-            University university = _context.Universities.First(u => u.Name == name);
-            return JsonConvert.SerializeObject(university.Faculties.Select(f => new { f.Id, f.Name }).ToArray());
+            var university = _context.Universities.First(u => u.Name == name);
+            return JsonConvert.SerializeObject(university.Faculties.Select(f => new { f.FacultyId, f.Name }).ToArray());
         }
     }
 }

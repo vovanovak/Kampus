@@ -13,7 +13,7 @@ namespace Kampus.Application.Mappers.Impl
         {
             return new UserModel()
             {
-                Id = user.Id,
+                Id = user.UserId,
                 Username = user.Username,
                 Email = user.Email,
                 Password = user.Password,

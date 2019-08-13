@@ -5,6 +5,7 @@ namespace Kampus.Persistence.Entities.NotificationRelated
 {
     public class Notification
     {
+        public int NotificationId { get; set; }
         public string Message { get; set; }
         public string Link { get; set; }
 
@@ -21,7 +22,24 @@ namespace Kampus.Persistence.Entities.NotificationRelated
 
         public Notification()
         {
+        }
 
+        public Notification(
+            DateTime date,
+            NotificationType type,
+            User sender,
+            User receiver,
+            string link,
+            string message)
+        {
+            Date = date;
+            Type = type;
+            Sender = sender;
+            SenderId = sender.UserId;
+            ReceiverId = receiver.UserId;
+            Receiver = receiver;
+            Link = link;
+            Message = message;
         }
 
         public static Notification From(DateTime date, NotificationType type,
@@ -38,6 +56,5 @@ namespace Kampus.Persistence.Entities.NotificationRelated
             notification.Message = message;
             return notification;
         }
-
     }
 }

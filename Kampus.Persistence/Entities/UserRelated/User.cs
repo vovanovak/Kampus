@@ -40,9 +40,9 @@ namespace Kampus.Persistence.Entities.UserRelated
         public List<TaskEntry> Tasks { get; set; }
         public List<Message> Messages { get; set; }
         public List<WallPost> Posts { get; set; }
-        public List<User> Friends { get; set; }
-        public List<User> Subscribers { get; set; }
-        public List<User> BlackList { get; set; }
+        public List<Friend> Friends { get; set; }
+        public List<Subscriber> Subscribers { get; set; }
+        public List<BlackList> BlackList { get; set; }
         public List<TaskCategory> Achievements { get; set; }
     }
 }

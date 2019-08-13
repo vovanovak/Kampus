@@ -6,6 +6,7 @@ using Kampus.Models;
 using Kampus.Persistence.Contexts;
 using Kampus.Persistence.Entities.NotificationRelated;
 using Kampus.Persistence.Entities.UserRelated;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kampus.Application.Services.Users.Impl
 {
@@ -23,16 +24,18 @@ namespace Kampus.Application.Services.Users.Impl
             if (id == userId)
                 throw new SameUserException();
 
-            User u1 = _context.Users.First(u => u.Id == id);
-            User u2 = _context.Users.First(u => u.Id == userId);
+            var u1 = _context.Users.First(u => u.UserId == id);
+            var u2 = _context.Users.First(u => u.UserId == userId);
 
-            u1.Friends.Add(u2);
-            u2.Friends.Add(u1);
+            _context.Friends.Add(new Friend { User1Id = id, User2Id = userId });
+            _context.Friends.Add(new Friend { User1Id = userId, User2Id = id });
 
-            u1.Subscribers.Remove(u2);
-            u2.Subscribers.Remove(u1);
+            var subscribers = _context.Subscribers.Where(s => s.User1Id == id && s.User2Id == userId ||
+                                                              s.User1Id == userId && s.User2Id == id).ToList();
 
-            Notification notification = Notification.From(DateTime.Now, NotificationType.Friendship,
+            _context.Subscribers.RemoveRange(subscribers);
+
+            var notification = Notification.From(DateTime.Now, NotificationType.Friendship,
                 u1, u2, "/Home/Friends", "@" + u1.Username + " додав вас як друга");
 
             _context.Notifications.Add(notification);
@@ -45,17 +48,25 @@ namespace Kampus.Application.Services.Users.Impl
             if (receiver.Id == sender.Id)
                 throw new SameUserException();
 
-            User dbReceiver = _context.Users.First(u => u.Id == receiver.Id);
-            User dbSender = _context.Users.First(s => s.Id == sender.Id);
+            var dbReceiver = _context.Users.First(u => u.UserId == receiver.Id);
+            var dbSender = _context.Users.First(s => s.UserId == sender.Id);
 
-            if (dbReceiver.Friends.Contains(dbSender))
+            if (_context.Friends.Any(f => f.User1Id == sender.Id && f.User2Id == receiver.Id))
                 throw new SubscribeOnFriendException();
 
-            if (!dbReceiver.Subscribers.Contains(dbSender))
-                dbReceiver.Subscribers.Add(dbSender);
+            var subscribers = _context.Subscribers
+                .Where(s => s.User1Id == sender.Id && s.User2Id == receiver.Id ||
+                            s.User1Id == receiver.Id && s.User2Id == sender.Id)
+                .ToList();
+
+            if (subscribers.Count > 0)
+            {
+                _context.Subscribers.RemoveRange(subscribers);
+            }
             else
             {
-                dbReceiver.Subscribers.Remove(dbSender);
+                _context.Subscribers.Add(new Subscriber {User1Id = sender.Id, User2Id = receiver.Id});
+                _context.Subscribers.Add(new Subscriber {User1Id = receiver.Id, User2Id = sender.Id});
             }
 
             Notification notification = Notification.From(DateTime.Now, NotificationType.Subscribed,
@@ -67,38 +78,36 @@ namespace Kampus.Application.Services.Users.Impl
 
         public List<UserShortModel> GetUserFriends(int userId)
         {
-            User user = _context.Users.First(u => u.Id == userId);
-            if (user.Friends == null)
-            {
-                user.Friends = new List<User>();
-                return new List<UserShortModel>();
-            }
-            return user.Friends.Select(u => new UserShortModel() { Id = u.Id, Username = u.Username, Avatar = u.Avatar }).ToList();
+            return _context.Friends
+                .Include(s => s.User1)
+                .Include(s => s.User2)
+                .Where(s => s.User1Id == userId)
+                .Select(u => new UserShortModel(u.User2.UserId, u.User2.Username, u.User2.Avatar))
+                .ToList();
         }
 
         public List<UserShortModel> GetUserSubscribers(int userId)
         {
-            User user = _context.Users.First(u => u.Id == userId);
-
-            if (user.Subscribers == null)
-            {
-                user.Subscribers = new List<User>();
-                return new List<UserShortModel>();
-            }
-
-            return user.Subscribers.Select(u => new UserShortModel() { Id = u.Id, Username = u.Username, Avatar = u.Avatar }).ToList();
+            return _context.Subscribers
+                .Include(s => s.User1)
+                .Include(s => s.User2)
+                .Where(s => s.User1Id == userId)
+                .Select(u => new UserShortModel(u.User2.UserId, u.User2.Username, u.User2.Avatar))
+                .ToList();
         }
 
         public void RemoveFriend(int id, int friendId)
         {
-            User u1 = _context.Users.First(u => u.Id == id);
-            User u2 = _context.Users.First(u => u.Id == friendId);
+            var friendsToRemove = _context.Friends.Where(f => f.User1Id == id && f.User2Id == friendId ||
+                                                              f.User1Id == friendId && f.User2Id == id)
+                .ToList();
 
-            u1.Friends.Remove(u2);
-            u1.Subscribers.Add(u2);
+            var subscribersToRemove = _context.Subscribers.Where(s => s.User1Id == id && s.User2Id == friendId ||
+                                                                      s.User1Id == friendId && s.User2Id == id)
+                .ToList();
 
-            u2.Friends.Remove(u1);
-            u2.Subscribers.Remove(u1);
+            _context.Friends.RemoveRange(friendsToRemove);
+            _context.Subscribers.RemoveRange(subscribersToRemove);
 
             _context.SaveChanges();
         }

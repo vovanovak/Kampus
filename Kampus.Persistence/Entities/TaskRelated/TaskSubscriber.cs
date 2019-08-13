@@ -4,6 +4,8 @@ namespace Kampus.Persistence.Entities.TaskRelated
 {
     public class TaskSubscriber
     {
+        public int TaskSubscriberId { get; set; }
+
         public int SubscriberId { get; set; }
         public User Subscriber { get; set; }
 
