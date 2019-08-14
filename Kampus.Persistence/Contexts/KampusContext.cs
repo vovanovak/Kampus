@@ -13,6 +13,7 @@ namespace Kampus.Persistence.Contexts
 {
     public class KampusContext : DbContext
     {
+        public DbSet<Achievement> Achievements { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Friend> Friends { get; set; }
         public DbSet<Subscriber> Subscribers { get; set; }

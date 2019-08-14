@@ -30,7 +30,7 @@ GO
 
 CREATE TABLE [dbo].[UserPermissions]
 (
-    [UserPermissionsId]      INT PRIMARY KEY IDENTITY (1, 1),
+    [UserPermissionsId]     INT PRIMARY KEY IDENTITY (1, 1),
     [AllowToWriteOnMyWall]  BIT NOT NULL,
     [AllowToWriteComments]  BIT NOT NULL,
     [AllowToSendMeAMessage] BIT NOT NULL
@@ -49,16 +49,16 @@ GO
 CREATE TABLE [dbo].[Users]
 (
     [UserId]                   INT PRIMARY KEY IDENTITY (1, 1),
-    [Username]                 NVARCHAR(64)   NOT NULL,
-    [Password]                 NVARCHAR(64)   NOT NULL,
-    [Email]                    NVARCHAR(64)   NOT NULL,
+    [Username]                 NVARCHAR(64)  NOT NULL,
+    [Password]                 NVARCHAR(64)  NOT NULL,
+    [Email]                    NVARCHAR(64)  NOT NULL,
     [Status]                   NVARCHAR(1024),
     [Avatar]                   NVARCHAR(512),
-    [Fullname]                 NVARCHAR(128)  NOT NULL,
-    [Rating]                   FLOAT          NOT NULL,
+    [Fullname]                 NVARCHAR(128) NOT NULL,
+    [Rating]                   FLOAT         NOT NULL,
 
-    [DateOfBirth]              DATETIME2      NOT NULL,
-    [NotificationsLastChecked] DATETIME2      NOT NULL,
+    [DateOfBirth]              DATETIME2     NOT NULL,
+    [NotificationsLastChecked] DATETIME2     NOT NULL,
 
     [StudentDetailsId]         INT FOREIGN KEY REFERENCES [dbo].[StudentDetails] ([StudentDetailsId]),
     [UserPermissionsId]        INT FOREIGN KEY REFERENCES [dbo].[UserPermissions] ([UserPermissionsId]),
@@ -78,24 +78,24 @@ GO
 CREATE TABLE [dbo].[Friends]
 (
     [FriendId] INT PRIMARY KEY IDENTITY (1, 1),
-    [UserId1]  INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
-    [UserId2]  INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
+    [User1Id]  INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
+    [User2Id]  INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
 )
 GO
 
 CREATE TABLE [dbo].[Subscribers]
 (
     [SubscriberId] INT PRIMARY KEY IDENTITY (1, 1),
-    [UserId1]      INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
-    [UserId2]      INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
+    [User1Id]      INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
+    [User2Id]      INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
 )
 GO
 
 CREATE TABLE [dbo].[BlackList]
 (
     [BlackListId] INT PRIMARY KEY IDENTITY (1, 1),
-    [UserId1]     INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
-    [UserId2]     INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
+    [User1Id]     INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
+    [User2Id]     INT NOT NULL FOREIGN KEY REFERENCES [dbo].[Users] ([UserId]),
 )
 GO
 

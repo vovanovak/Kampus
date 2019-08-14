@@ -37,12 +37,6 @@ namespace Kampus.Persistence.Entities.UserRelated
         public int UserPermissionsId { get; set; }
         public UserPermissions UserPermissions { get; set; }
 
-        public List<TaskEntry> Tasks { get; set; }
-        public List<Message> Messages { get; set; }
-        public List<WallPost> Posts { get; set; }
-        public List<Friend> Friends { get; set; }
-        public List<Subscriber> Subscribers { get; set; }
-        public List<BlackList> BlackList { get; set; }
         public List<Achievement> Achievements { get; set; }
     }
 }

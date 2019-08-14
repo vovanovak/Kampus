@@ -26,6 +26,8 @@ namespace Kampus.Application.Services.Impl
         private IQueryable<WallPost> GetAllPostsWithRelatedEntities()
         {
             return _context.WallPosts
+                .Include(p => p.Owner)
+                .Include(p => p.Sender)
                 .Include(p => p.Likes)
                     .ThenInclude(l => l.Liker)
                 .Include(p => p.Comments)

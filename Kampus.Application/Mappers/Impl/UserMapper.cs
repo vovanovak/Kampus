@@ -28,11 +28,11 @@ namespace Kampus.Application.Mappers.Impl
 
                 Status = user.Status,
 
-                Achievements = user.Achievements.Select(a => a.TaskCategory.Name).ToList(),
+                Achievements = user.Achievements?.Select(a => a.TaskCategory.Name).ToList() ?? new List<string>(),
 
                 UniversityName = (user.StudentDetails != null) ? user.StudentDetails.University.Name : "",
                 UniversityFaculty = ((user.StudentDetails != null) ? user.StudentDetails.Faculty.Name : ""),
-                UniversityCourse = user.StudentDetails.Course
+                UniversityCourse = user.StudentDetails?.Course ?? 0
             };
         }
     }

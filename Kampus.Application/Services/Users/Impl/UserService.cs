@@ -26,6 +26,8 @@ namespace Kampus.Application.Services.Users.Impl
         private IQueryable<User> GetUsers()
         {
             return _context.Users
+                .Include(u => u.City)
+                .Include(u => u.Role)
                 .Include(u => u.Achievements)
                 .Include(u => u.StudentDetails)
                 .ThenInclude(u => u.University)
