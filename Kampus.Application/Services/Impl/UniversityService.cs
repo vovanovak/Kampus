@@ -4,6 +4,7 @@ using Kampus.Application.Mappers;
 using Kampus.Models;
 using Kampus.Persistence.Contexts;
 using Kampus.Persistence.Entities.UniversityRelated;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Kampus.Application.Services.Impl
@@ -19,6 +20,11 @@ namespace Kampus.Application.Services.Impl
             _universityMapper = universityMapper;
         }
 
+        private static IQueryable<University> GetUniversities(KampusContext context)
+        {
+            return context.Universities.Include(u => u.Faculties);
+        }
+
         public int GetFacultyId(int universityId, string name)
         {
             return _context.Faculties.First(f => f.UniversityId == universityId && f.Name == name).FacultyId;
@@ -26,12 +32,12 @@ namespace Kampus.Application.Services.Impl
 
         public List<UniversityModel> GetUniversities()
         {
-            return _context.Universities.Select(_universityMapper.Map).ToList();
+            return GetUniversities(_context).Select(u => _universityMapper.Map(u)).ToList();
         }
 
         public string GetUniversityFaculties(string name)
         {
-            var university = _context.Universities.First(u => u.Name == name);
+            var university = GetUniversities(_context).First(u => u.Name == name);
             return JsonConvert.SerializeObject(university.Faculties.Select(f => new { f.FacultyId, f.Name }).ToArray());
         }
     }

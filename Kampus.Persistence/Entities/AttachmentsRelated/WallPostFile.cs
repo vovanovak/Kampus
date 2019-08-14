@@ -4,6 +4,8 @@ namespace Kampus.Persistence.Entities.AttachmentsRelated
 {
     public class WallPostFile
     {
+        public int WallPostFileId { get; set; }
+
         public int WallPostId { get; set; }
         public WallPost WallPost { get; set; }
 

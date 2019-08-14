@@ -17,7 +17,7 @@ namespace Kampus.Persistence.Entities.UserRelated
         public string Status { get; set; }
         public string Avatar { get; set; }
         public string Fullname { get; set; }
-        public float Rating { get; set; }
+        public double Rating { get; set; }
 
         [Column(TypeName = "datetime2")]
         public DateTime DateOfBirth { get; set; }
@@ -34,8 +34,8 @@ namespace Kampus.Persistence.Entities.UserRelated
         public int CityId { get; set; }
         public City City { get; set; }
 
-        public int PermissionsId { get; set; }
-        public UserPermissions Permissions { get; set; }
+        public int UserPermissionsId { get; set; }
+        public UserPermissions UserPermissions { get; set; }
 
         public List<TaskEntry> Tasks { get; set; }
         public List<Message> Messages { get; set; }
@@ -43,6 +43,6 @@ namespace Kampus.Persistence.Entities.UserRelated
         public List<Friend> Friends { get; set; }
         public List<Subscriber> Subscribers { get; set; }
         public List<BlackList> BlackList { get; set; }
-        public List<TaskCategory> Achievements { get; set; }
+        public List<Achievement> Achievements { get; set; }
     }
 }

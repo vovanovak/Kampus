@@ -135,7 +135,7 @@ namespace Kampus.Host.Controllers
         public ActionResult Step4(UserModel u)
         {
             _userService.RegisterUser(_userModel);
-            return RedirectToAction("Index", "SignIn");
+            return RedirectToAction("SignIn", "Main");
         }
 
         [HttpPost]

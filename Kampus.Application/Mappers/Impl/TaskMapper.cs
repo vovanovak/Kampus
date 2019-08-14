@@ -13,8 +13,8 @@ namespace Kampus.Application.Mappers.Impl
             return new TaskModel()
             {
                 Id = taskEntry.TaskId,
-                Category = taskEntry.TaskCat.TaskCategoryId,
-                CategoryName = taskEntry.TaskCat.Name,
+                Category = taskEntry.TaskCategory.TaskCategoryId,
+                CategoryName = taskEntry.TaskCategory.Name,
                 Header = taskEntry.Header,
                 Content = taskEntry.Content,
                 Hide = taskEntry.Hide,

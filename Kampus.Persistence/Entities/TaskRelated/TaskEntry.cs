@@ -22,7 +22,7 @@ namespace Kampus.Persistence.Entities.TaskRelated
         public bool Hide { get; set; }
 
         public int TaskCategoryId { get; set; }
-        public virtual TaskCategory TaskCat { get; set; }
+        public virtual TaskCategory TaskCategory { get; set; }
 
         public int TaskSubcategoryId { get; set; }
         public virtual TaskSubcategory TaskSubcategory { get; set; }

@@ -28,7 +28,7 @@ namespace Kampus.Application.Services.Impl
         private IQueryable<TaskEntry> GetTasks()
         {
             return _context.Tasks
-                .Include(t => t.TaskCat)
+                .Include(t => t.TaskCategory)
                 .Include(t => t.TaskSubcategory)
                 .Include(t => t.Creator)
                 .Include(t => t.Executive)
@@ -145,19 +145,19 @@ namespace Kampus.Application.Services.Impl
                 return LikeResult.Unliked;
             }
 
-            var like = new TaskLike { TaskEntry = _context.Tasks.First(t => t.TaskId == taskId) };
+            var like = new TaskLike { Task = _context.Tasks.First(t => t.TaskId == taskId) };
 
-            like.TaskId = like.TaskEntry.TaskId;
+            like.TaskId = like.Task.TaskId;
 
             like.Liker = user;
             like.LikerId = user.UserId;
 
             _context.TaskLikes.Add(like);
 
-            if (like.TaskEntry.Creator.UserId != user.UserId)
+            if (like.Task.Creator.UserId != user.UserId)
             {
                 var notification = new Notification(DateTime.Now, NotificationType.TaskLike,
-                    like.TaskEntry.Creator, user, "/Tasks/Id/" + taskId, "@" + user.Username + " оцінив ваше завдання");
+                    like.Task.Creator, user, "/Tasks/Id/" + taskId, "@" + user.Username + " оцінив ваше завдання");
                 _context.Notifications.Add(notification);
             }
 
@@ -228,15 +228,15 @@ namespace Kampus.Application.Services.Impl
                 if (taskEntry.Executive != null)
                 {
                     if (taskEntry.Executive.Achievements == null)
-                        taskEntry.Executive.Achievements = new List<TaskCategory>();
+                        taskEntry.Executive.Achievements = new List<Achievement>();
 
-                    if (taskEntry.Executive.Achievements.All(t => t.Name != taskEntry.TaskCat.Name) &&
+                    if (taskEntry.Executive.Achievements.All(t => t.TaskCategory.Name != taskEntry.TaskCategory.Name) &&
                         _context.Tasks.Count(t => t.Solved == true && t.Executive.UserId == taskEntry.Executive.UserId) >= 3)
                     {
-                        taskEntry.Executive.Achievements.Add(taskEntry.TaskCat);
+                        taskEntry.Executive.Achievements.Add(new Achievement { TaskCategory = taskEntry.TaskCategory, User = taskEntry.Executive });
 
                         Notification notificationAchievement = Notification.From(DateTime.Now, NotificationType.Achievement,
-                            taskEntry.Creator, taskEntry.Executive, "/Tasks/Id/" + taskEntry.TaskId, "Новий бейдж в категорії \"" + taskEntry.TaskCat.Name + "\"");
+                            taskEntry.Creator, taskEntry.Executive, "/Tasks/Id/" + taskEntry.TaskId, "Новий бейдж в категорії \"" + taskEntry.TaskCategory.Name + "\"");
 
                         _context.Notifications.Add(notificationAchievement);
                     }
@@ -372,7 +372,7 @@ namespace Kampus.Application.Services.Impl
 
             var review = new TaskExecutionReview();
             review.TaskId = model.TaskId.Value;
-            review.TaskEntry = taskEntry;
+            review.Task = taskEntry;
             review.ExecutorId = taskEntry.ExecutiveId.Value;
             review.Executor = taskEntry.Executive;
 
@@ -415,7 +415,7 @@ namespace Kampus.Application.Services.Impl
                 CreatorId = userId,
                 Creator = _context.Users.First(u => u.UserId == userId),
                 TaskCategoryId = category,
-                TaskCat = _context.TaskCategories.First(c => c.TaskCategoryId == category),
+                TaskCategory = _context.TaskCategories.First(c => c.TaskCategoryId == category),
                 TaskSubcategoryId = subcategory,
                 TaskSubcategory = _context.TaskSubcategories.First(s => s.TaskSubcategoryId == subcategory),
                 TaskLikes = new List<TaskLike>(),

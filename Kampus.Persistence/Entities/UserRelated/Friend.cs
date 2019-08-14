@@ -6,6 +6,8 @@ namespace Kampus.Persistence.Entities.UserRelated
 {
     public class Friend
     {
+        public int FriendId { get; set; }
+
         public int User1Id { get; set; }
         public User User1 { get; set; }
 

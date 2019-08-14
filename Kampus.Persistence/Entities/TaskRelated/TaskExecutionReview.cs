@@ -7,7 +7,7 @@ namespace Kampus.Persistence.Entities.TaskRelated
         public int TaskExecutionReviewId { get; set; }
 
         public int TaskId { get; set; }
-        public TaskEntry TaskEntry { get; set; }
+        public TaskEntry Task { get; set; }
 
         public int ExecutorId { get; set; }
         public User Executor { get; set; }

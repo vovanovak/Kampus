@@ -1,10 +1,12 @@
-﻿using Kampus.Persistence.Entities.AttachmentsRelated;
+﻿using System.Security.Cryptography.X509Certificates;
+using Kampus.Persistence.Entities.AttachmentsRelated;
 using Kampus.Persistence.Entities.MessageRelated;
 using Kampus.Persistence.Entities.NotificationRelated;
 using Kampus.Persistence.Entities.TaskRelated;
 using Kampus.Persistence.Entities.UniversityRelated;
 using Kampus.Persistence.Entities.UserRelated;
 using Kampus.Persistence.Entities.WallPostRelated;
+using Kampus.Persistence.EntityTypeConfigurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kampus.Persistence.Contexts
@@ -17,7 +19,7 @@ namespace Kampus.Persistence.Contexts
         public DbSet<BlackList> BlackLists { get; set; }
         public DbSet<UserRecovery> Recoveries { get; set; }
         public DbSet<TaskExecutionReview> Reviews { get; set; }
-        public DbSet<Role> UserRoles { get; set; }
+        public DbSet<Role> Roles { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<StudentDetails> StudentDetails { get; set; }
         public DbSet<TaskEntry> Tasks { get; set; }
@@ -32,7 +34,7 @@ namespace Kampus.Persistence.Contexts
         public DbSet<WallPostLike> WallPostLikes { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Faculty> Faculties { get; set; }
-        public DbSet<UserPermissions> Permissions { get; set; }
+        public DbSet<UserPermissions> UserPermissions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<MessageFile> MessageFiles { get; set; }
@@ -50,6 +52,31 @@ namespace Kampus.Persistence.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfiguration(new MessageFileEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new TaskFileEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new WallPostFileEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new MessageEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new NotificationEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new AchievementEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new TaskCategoryEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new TaskCommentEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new TaskEntryEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new TaskExecutionReviewEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new TaskLikeEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new TaskSubcategoryEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new TaskSubscriberEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new FacultyEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new BlackListEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new FriendEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new SubscriberEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new StudentDetailsEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new UserRecoveryEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new UserEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new WallPostEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new WallPostCommentEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new WallPostLikeEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new UserPermissionsEntityTypeConfiguration());
         }
     }
 }

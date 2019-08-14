@@ -4,6 +4,8 @@ namespace Kampus.Persistence.Entities.WallPostRelated
 {
     public class WallPostLike
     {
+        public int WallPostLikeId { get; set; }
+
         public int LikerId { get; set; }
         public User Liker { get; set; }
 

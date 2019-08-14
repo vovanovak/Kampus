@@ -2,6 +2,8 @@
 {
     public class Subscriber
     {
+        public int SubscriberId { get; set; }
+
         public int User1Id { get; set; }
         public User User1 { get; set; }
 

@@ -8,6 +8,7 @@ using Kampus.Persistence.Contexts;
 using Kampus.Persistence.Entities.UniversityRelated;
 using Kampus.Persistence.Entities.UserRelated;
 using Kampus.Persistence.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kampus.Application.Services.Users.Impl
 {
@@ -22,19 +23,29 @@ namespace Kampus.Application.Services.Users.Impl
             _userMapper = userMapper;
         }
 
+        private IQueryable<User> GetUsers()
+        {
+            return _context.Users
+                .Include(u => u.Achievements)
+                .Include(u => u.StudentDetails)
+                .ThenInclude(u => u.University)
+                .Include(u => u.StudentDetails)
+                .ThenInclude(u => u.Faculty);
+        }
+
         public List<UserModel> GetAll()
         {
-            return _context.Users.Select(_userMapper.Map).ToList();
+            return GetUsers().Select(u => _userMapper.Map(u)).ToList();
         }
 
         public UserModel GetById(int userId)
         {
-            return _userMapper.Map(_context.Users.Single(u => u.UserId == userId));
+            return _userMapper.Map(GetUsers().Single(u => u.UserId == userId));
         }
 
         public UserModel GetByUsername(string username)
         {
-            return _context.Users.Where(u => u.Username == username).Select(_userMapper.Map).First();
+            return GetUsers().Where(u => u.Username == username).Select(u => _userMapper.Map(u)).First();
         }
 
         public void RegisterUser(UserModel model)
@@ -51,7 +62,8 @@ namespace Kampus.Application.Services.Users.Impl
             dbEntity.DateOfBirth = model.DateOfBirth >= (DateTime)SqlDateTime.MinValue ? model.DateOfBirth : DateTime.MinValue;
             dbEntity.NotificationsLastChecked = DateTime.Now;
             dbEntity.City = _context.Cities.First(c => c.Name == model.City);
-            dbEntity.Role = _context.UserRoles.First(r => r.Name == "User");
+            dbEntity.Role = _context.Roles.First(r => r.Name == "User");
+            dbEntity.UserPermissions = UserPermissions.AllowAll();
 
             if (model.IsNotStudent)
                 dbEntity.StudentDetails = null;
@@ -71,6 +83,9 @@ namespace Kampus.Application.Services.Users.Impl
                     dbEntity.StudentDetails.Faculty = new Faculty();
                 dbEntity.StudentDetails.Faculty = _context.Faculties.First(u => u.Name == model.UniversityFaculty && u.UniversityId == dbEntity.StudentDetails.University.UniversityId);
             }
+
+            _context.Users.Add(dbEntity);
+            _context.SaveChanges();
         }
 
         public SignInResult SignIn(string username, string password)
@@ -129,7 +144,7 @@ namespace Kampus.Application.Services.Users.Impl
 
         public void ChangeStudentInfo(int userId, string university, string faculty, int course)
         {
-            User user = _context.Users.First(u => u.UserId == userId);
+            User user = GetUsers().First(u => u.UserId == userId);
             if (user.StudentDetails == null)
                 user.StudentDetails = new StudentDetails();
 

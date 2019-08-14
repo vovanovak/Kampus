@@ -7,6 +7,8 @@ namespace Kampus.Persistence.Entities.AttachmentsRelated
 {
     public class TaskFile
     {
+        public int TaskFileId { get; set; }
+
         public int TaskId { get; set; }
         public TaskEntry Task { get; set; }
 

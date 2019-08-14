@@ -28,7 +28,7 @@ namespace Kampus.Application.Mappers.Impl
 
                 Status = user.Status,
 
-                Achievements = user.Achievements.Select(a => a.Name).ToList(),
+                Achievements = user.Achievements.Select(a => a.TaskCategory.Name).ToList(),
 
                 UniversityName = (user.StudentDetails != null) ? user.StudentDetails.University.Name : "",
                 UniversityFaculty = ((user.StudentDetails != null) ? user.StudentDetails.Faculty.Name : ""),

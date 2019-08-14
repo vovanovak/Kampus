@@ -54,7 +54,7 @@ namespace Kampus.Models
         public string Status { get; set; }
         public string About { get; set; }
 
-        public float Rating { get; set; }
+        public double Rating { get; set; }
 
         public virtual List<string> Achievements { get; set; }
 
@@ -64,6 +64,5 @@ namespace Kampus.Models
         public virtual List<MessageModel> Messages { get; set; }
         public virtual List<WallPostModel> Posts { get; set; }
         public virtual List<GroupModel> Groups { get; set; }
-
     }
 }

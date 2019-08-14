@@ -174,3 +174,7 @@ VALUES
 	(3, 'Хімічний факультет'),
 	(3, 'Юридичний факультет')
 GO
+
+INSERT INTO [dbo].[Roles]([Name])
+VALUES ('Admin'),
+    ('User')
