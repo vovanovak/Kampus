@@ -1,12 +1,13 @@
 ﻿using Kampus.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Kampus.Application.Services
 {
     public interface INotificationService
     {
-        IReadOnlyList<NotificationModel> GetNewNotifications(int userId);
-        void SetNotificationSeen(int notificationId);
-        void ViewUnseenNotifications(int userId);
+        Task<IReadOnlyList<NotificationModel>> GetNewNotifications(int userId);
+        Task SetNotificationSeen(int notificationId);
+        Task ViewUnseenNotifications(int userId);
     }
 }

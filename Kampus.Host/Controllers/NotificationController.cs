@@ -1,8 +1,8 @@
-﻿using Kampus.Application.Services;
+﻿using System.Threading.Tasks;
+using Kampus.Application.Services;
 using Kampus.Host.Constants;
 using Kampus.Host.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Kampus.Host.Controllers
 {
@@ -16,18 +16,18 @@ namespace Kampus.Host.Controllers
         }
 
         [HttpGet]
-        public string GetNewNotifications()
+        public async Task<IActionResult> GetNewNotifications()
         {
             var userId = HttpContext.Session.Get<int>(SessionKeyConstants.CurrentUserId);
-            var notifications = _notificationService.GetNewNotifications(userId);
-            return JsonConvert.SerializeObject(notifications);
+            var notifications = await _notificationService.GetNewNotifications(userId);
+            return Json(notifications);
         }
 
         [HttpPost]
-        public void ViewNotifications()
+        public async Task ViewNotifications()
         {
             var userId = HttpContext.Session.Get<int>(SessionKeyConstants.CurrentUserId);
-            _notificationService.ViewUnseenNotifications(userId);
+            await _notificationService.ViewUnseenNotifications(userId);
         }
     }
 }

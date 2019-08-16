@@ -62,7 +62,7 @@ namespace Kampus.Models
         public virtual List<UserShortModel> Subscribers { get; set; }
         public virtual List<TaskModel> Tasks { get; set; }
         public virtual List<MessageModel> Messages { get; set; }
-        public virtual List<WallPostModel> Posts { get; set; }
+        public virtual IReadOnlyList<WallPostModel> Posts { get; set; }
         public virtual List<GroupModel> Groups { get; set; }
     }
 }

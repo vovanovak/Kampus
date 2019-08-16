@@ -1,4 +1,5 @@
-﻿using Kampus.Host.Services;
+﻿using System.Threading.Tasks;
+using Kampus.Host.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kampus.Host.Controllers
@@ -12,11 +13,11 @@ namespace Kampus.Host.Controllers
             _fileService = fileService;
         }
 
-        public ActionResult Download(string path, string fileName)
+        public async Task<IActionResult> Download(string path, string fileName)
         {
             try
             {
-                var bytes = _fileService.Download(path);
+                var bytes = await _fileService.Download(path);
                 return File(bytes, "application/zip", fileName);
             }
             catch

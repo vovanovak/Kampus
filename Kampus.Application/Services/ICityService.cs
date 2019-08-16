@@ -1,10 +1,11 @@
 ﻿using Kampus.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Kampus.Application.Services
 {
     public interface ICityService
     {
-        List<CityModel> GetCities();
+        Task<IReadOnlyList<CityModel>> GetCities();
     }
 }

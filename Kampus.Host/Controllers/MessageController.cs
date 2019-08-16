@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Kampus.Application.Services;
 using Kampus.Application.Services.Users;
 using Kampus.Host.Constants;
@@ -7,7 +8,6 @@ using Kampus.Host.Extensions;
 using Kampus.Host.Services;
 using Kampus.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Kampus.Host.Controllers
 {
@@ -29,33 +29,29 @@ namespace Kampus.Host.Controllers
             _fileService = fileService;
         }
 
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            UserModel sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
+            var sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
 
-            List<MessageModel> messages = _messageService.GetUserMessages(sender.Id);
-            List<UserShortModel> messangers = _messageService.GetUserMessangers(sender.Id);
-
-            if (messangers.Any(u => u.Id == sender.Id))
-                messangers.RemoveAll(u => u.Id == sender.Id);
+            var messages = await _messageService.GetUserMessages(sender.Id);
+            var messangers = await _messageService.GetUserMessangers(sender.Id);
 
             var firstOrDefault = messangers.FirstOrDefault();
             if (firstOrDefault != null)
             {
-                UserModel receiver = _userService.GetByUsername(firstOrDefault.Username);
+                var receiver = await _userService.GetByUsername(firstOrDefault.Username);
 
                 ViewBag.Messangers = messangers;
                 ViewBag.SecondUser = receiver.Username;
 
-                List<MessageModel> toViewBag =
-                    messangers.Select(u => messages.OrderBy(m => m.CreationDate).Last()).ToList();
+                var toViewBag = messangers.Select(u => messages.OrderBy(m => m.CreationDate).Last()).ToList();
 
                 ViewBag.FirstMessages = toViewBag;
 
                 ViewBag.CurrentUser = sender;
                 ViewBag.UserProfile = receiver;
 
-                ViewBag.Messages = _messageService.GetMessages(sender.Id, receiver.Id).OrderBy(m => m.CreationDate.Ticks);
+                ViewBag.Messages = (await _messageService.GetMessages(sender.Id, receiver.Id)).OrderBy(m => m.CreationDate.Ticks);
             }
             else
             {
@@ -66,16 +62,13 @@ namespace Kampus.Host.Controllers
             return View("Conversation");
         }
 
-        public ActionResult Conversation(string username)
+        public async Task<IActionResult> Conversation(string username)
         {
-            UserModel sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
-            UserModel receiver = _userService.GetByUsername(username);
+            var sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
+            var receiver = await _userService.GetByUsername(username);
 
-            List<MessageModel> messages = _messageService.GetUserMessages(sender.Id);
-
-            List<UserShortModel> messangers = _messageService.GetUserMessangers(sender.Id);
-
-            messangers.RemoveAll(u => u.Id == sender.Id);
+            var messages = await _messageService.GetUserMessages(sender.Id);
+            var messangers = (await _messageService.GetUserMessangers(sender.Id)).ToList();
 
             if (messangers.All(u => u.Username != username))
             {
@@ -85,7 +78,7 @@ namespace Kampus.Host.Controllers
             ViewBag.Messangers = messangers;
             ViewBag.SecondUser = username;
 
-            List<MessageModel> toViewBag = messangers.Select(u => messages.OrderBy(m => m.CreationDate).LastOrDefault()).ToList();
+            var toViewBag = messangers.Select(u => messages.OrderBy(m => m.CreationDate).LastOrDefault()).ToList();
 
             ViewBag.FirstMessages = toViewBag;
 
@@ -98,34 +91,32 @@ namespace Kampus.Host.Controllers
         }
 
         [HttpPost]
-        public void UploadFileMessage()
+        public async Task UploadFileMessage()
         {
             if (_attachmentsMessages == null)
                 _attachmentsMessages = new List<FileModel>();
 
-            var files = _fileService.UploadFilesToServer(HttpContext);
+            var files = await _fileService.UploadFilesToServer(HttpContext);
             _attachmentsMessages.AddRange(files);
         }
 
         [HttpPost]
-        public string WriteMessage(int receiverId, string text)
+        public async Task<IActionResult> WriteMessage(int receiverId, string text)
         {
-            UserModel sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
-            UserModel receiver = _userService.GetById(receiverId);
+            var sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
 
-            _messageService.WriteMessage(sender.Id, receiverId, text, _attachmentsMessages);
+            await _messageService.WriteMessage(sender.Id, receiverId, text, _attachmentsMessages);
 
-            List<MessageModel> messages = _messageService.GetUserMessages(sender.Id);
+            var models = await _messageService.GetMessages(sender.Id, receiverId);
 
-            List<MessageModel> models = _messageService.GetMessages(sender.Id, receiverId);
             ViewBag.Messages = models;
 
             if (_attachmentsMessages != null)
                 _attachmentsMessages.Clear();
 
-            MessageModel last = models.OrderBy(m => m.CreationDate.Ticks).Last();
+            var last = models.OrderBy(m => m.CreationDate.Ticks).Last();
 
-            return JsonConvert.SerializeObject(new
+            return Json(new
             {
                 last.Id,
                 last.Sender.Username,
@@ -139,12 +130,11 @@ namespace Kampus.Host.Controllers
         }
 
         [HttpGet]
-        public string GetNewMessages(int senderId, int receiverId, int lastMsgId)
+        public async Task<IActionResult> GetNewMessages(int senderId, int receiverId, int lastMsgId)
         {
-            var messages = _messageService.GetNewMessages(senderId, receiverId, lastMsgId);
-            //var messangers = _messageService.GetNewUserMessangers(senderId);
+            var messages = await _messageService.GetNewMessages(senderId, receiverId, lastMsgId);
 
-            return JsonConvert.SerializeObject(new
+            return Json(new
             {
                 Messages = messages.Where(m => m.Sender.Id != senderId).Select(m => new
                 {
@@ -155,8 +145,7 @@ namespace Kampus.Host.Controllers
                     Files = m.Attachments.Where(a => !a.IsImage()),
                     Images = m.Attachments.Where(a => a.IsImage()),
                     IsSender = false
-                }).ToArray(),
-                //  Messangers = messangers
+                }).ToArray()
             });
         }
     }

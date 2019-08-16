@@ -6,7 +6,7 @@
 
         protected Entity()
         {
-            Id = -1;
+            Id = 0;
         }
 
         protected Entity(int id)
@@ -16,7 +16,7 @@
 
         public bool IsNew()
         {
-            return Id == -1;
+            return Id == 0;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
+using System.Threading.Tasks;
 using Kampus.Application.Mappers;
 using Kampus.Models;
 using Kampus.Persistence.Contexts;
@@ -45,9 +46,12 @@ namespace Kampus.Application.Services.Users.Impl
             return _userMapper.Map(GetUsers().Single(u => u.UserId == userId));
         }
 
-        public UserModel GetByUsername(string username)
+        public async Task<UserModel> GetByUsername(string username)
         {
-            return GetUsers().Where(u => u.Username == username).Select(u => _userMapper.Map(u)).First();
+            return await GetUsers()
+                .Where(u => u.Username == username)
+                .Select(u => _userMapper.Map(u))
+                .SingleAsync();
         }
 
         public void RegisterUser(UserModel model)
@@ -90,19 +94,19 @@ namespace Kampus.Application.Services.Users.Impl
             _context.SaveChanges();
         }
 
-        public SignInResult SignIn(string username, string password)
+        public async Task<SignInResult> SignIn(string username, string password)
         {
-            if (_context.Users.Any(u => u.Username == username && u.Password == password))
-                return SignInResult.Successful;
-            else if (_context.Users.Any(u => u.Username == username))
-                return SignInResult.WrongPassword;
-            else
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+
+            if (user == null)
                 return SignInResult.Error;
+
+            return user.Password == password ? SignInResult.Successful : SignInResult.WrongPassword;
         }
 
-        public bool ContainsUserWithSuchUsername(string username)
+        public async Task<bool> ContainsUserWithSuchUsername(string username)
         {
-            return _context.Users.Any(u => u.Username == username);
+            return await _context.Users.AnyAsync(u => u.Username == username);
         }
 
         public bool ContainsUserWithSuchEmail(string email)

@@ -36,24 +36,16 @@ namespace Kampus.Application.Mappers.Impl
             };
         }
 
-        public WallPost Map(WallPostModel entity)
+        public WallPost Map(WallPostModel entity, int ownerId, int senderId)
         {
             var wallPost = new WallPost { WallPostId = entity.Id, Content = entity.Content };
 
-            wallPost.OwnerId = wallPost.Owner.UserId;
-            wallPost.SenderId = wallPost.Sender.UserId;
+            wallPost.OwnerId = ownerId;
+            wallPost.SenderId = senderId;
 
             if (entity.Attachments != null)
             {
-                var files = new List<File>();
-
-                foreach (var link in entity.Attachments)
-                {
-                    var file = new File();
-                    file.RealFileName = link.RealFileName;
-                    file.FileName = link.FileName;
-                    files.Add(file);
-                }
+                var files = entity.Attachments.Select(link => new File {RealFileName = link.RealFileName, FileName = link.FileName}).ToList();
 
                 wallPost.Attachments = files.Select(f => new WallPostFile() { File = f, WallPost = wallPost }).ToList();
             }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Kampus.Application.Mappers;
 using Kampus.Models;
 using Kampus.Persistence.Contexts;
 using Kampus.Persistence.Entities.NotificationRelated;
 using Kampus.Persistence.Entities.UserRelated;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kampus.Application.Services.Impl
 {
@@ -20,16 +22,16 @@ namespace Kampus.Application.Services.Impl
             _notificationMapper = notificationMapper;
         }
 
-        public IReadOnlyList<NotificationModel> GetNewNotifications(int userId)
+        public async Task<IReadOnlyList<NotificationModel>> GetNewNotifications(int userId)
         {
-            var user = _context.Users.First(u => u.UserId == userId);
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserId == userId);
 
-            var notifications = _context.Notifications
+            var notifications = await _context.Notifications
                 .Where(n => n.ReceiverId == userId)
-                .Select(_notificationMapper.Map)
-                .ToList();
+                .Select(n => _notificationMapper.Map(n))
+                .ToListAsync();
 
-            var sec = TimeSpan.TicksPerSecond * 2;
+            const long sec = TimeSpan.TicksPerSecond * 2;
 
             notifications.RemoveAll(n => n.SeenDate != null && DateTime.Now.Ticks - n.SeenDate.Value.Ticks >= sec);
 
@@ -38,21 +40,23 @@ namespace Kampus.Application.Services.Impl
             return notifications;
         }
 
-        public void SetNotificationSeen(int notificationId)
+        public async Task SetNotificationSeen(int notificationId)
         {
-            var notification = _context.Notifications.Single(n => n.NotificationId == notificationId);
+            var notification = await _context.Notifications.SingleAsync(n => n.NotificationId == notificationId);
+
             notification.Seen = true;
             notification.SeenDate = DateTime.Now;
-            _context.SaveChanges();
+
+            await _context.SaveChangesAsync();
         }
 
-        public void ViewUnseenNotifications(int userId)
+        public async Task ViewUnseenNotifications(int userId)
         {
-            var notifications = _context.Notifications
+            var notifications = await _context.Notifications
                 .Where(n => n.ReceiverId == userId &&
                             n.Seen == false &&
                             n.SeenDate == null)
-                .ToList();
+                .ToListAsync();
 
             foreach (var n in notifications)
             {
@@ -60,7 +64,7 @@ namespace Kampus.Application.Services.Impl
                 n.SeenDate = DateTime.Now;
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

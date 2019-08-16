@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Kampus.Application.Mappers;
 using Kampus.Models;
 using Kampus.Persistence.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kampus.Application.Services.Impl
 {
@@ -17,9 +19,9 @@ namespace Kampus.Application.Services.Impl
             _cityMapper = cityMapper;
         }
 
-        public List<CityModel> GetCities()
+        public async Task<IReadOnlyList<CityModel>> GetCities()
         {
-            return _context.Cities.Select(_cityMapper.Map).ToList();
+            return await _context.Cities.Select(c => _cityMapper.Map(c)).ToListAsync();
         }
     }
 }

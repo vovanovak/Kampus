@@ -38,5 +38,13 @@ namespace Kampus.Persistence.Entities.UserRelated
         public UserPermissions UserPermissions { get; set; }
 
         public List<Achievement> Achievements { get; set; }
+
+        public int CalculateAge()
+        {
+            var today = DateTime.Today;
+            var age = today.Year - DateOfBirth.Year;
+            if (DateOfBirth > today.AddYears(-age)) age--;
+            return age;
+        }
     }
 }

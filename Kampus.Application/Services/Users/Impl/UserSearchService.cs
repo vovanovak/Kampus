@@ -54,18 +54,18 @@ namespace Kampus.Application.Services.Users.Impl
             }
             if (minAge != null && maxAge != null && minAge < maxAge)
             {
-                users.RemoveAll(u => CalculateAge(u.DateOfBirth) < minAge || CalculateAge(u.DateOfBirth) > maxAge);
+                users.RemoveAll(u => u.CalculateAge() < minAge || u.CalculateAge() > maxAge);
             }
             else
             {
                 if (minAge == null && maxAge != null)
                 {
-                    users.RemoveAll(u => CalculateAge(u.DateOfBirth) > maxAge);
+                    users.RemoveAll(u => u.CalculateAge() > maxAge);
                 }
 
                 if (maxAge == null && minAge != null)
                 {
-                    users.RemoveAll(u => CalculateAge(u.DateOfBirth) < minAge);
+                    users.RemoveAll(u => u.CalculateAge() < minAge);
                 }
             }
             if (minRating != null && maxRating != null && minRating < maxRating)
@@ -122,14 +122,6 @@ namespace Kampus.Application.Services.Users.Impl
             };
 
             return model;
-        }
-
-        private int CalculateAge(DateTime bday)
-        {
-            DateTime today = DateTime.Today;
-            int age = today.Year - bday.Year;
-            if (bday > today.AddYears(-age)) age--;
-            return age;
         }
     }
 }

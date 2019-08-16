@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Kampus.Application.Services;
 using Kampus.Application.Services.Users;
 using Kampus.Host.Extensions;
 using Kampus.Host.Services;
 using Kampus.Models;
+using Kampus.Persistence.Entities.UniversityRelated;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,7 +42,7 @@ namespace Kampus.Host.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Step1(UserModel u)
+        public async Task<IActionResult> Step1(UserModel u)
         {
             _userModel = new UserModel();
 
@@ -53,26 +54,24 @@ namespace Kampus.Host.Controllers
                 _userModel.Password = u.Password;
                 _userModel.FullName = u.FullName;
 
-                FillViewBag();
+                await FillViewBag();
 
                 return RedirectToAction("Step2");
             }
-            else
-            {
-                return View("Step1", _userModel);
-            }
+
+            return View("Step1", _userModel);
         }
 
-        public ActionResult Step2()
+        public async Task<IActionResult> Step2()
         {
-            FillViewBag();
+            await FillViewBag();
 
             return View(_userModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Step2(UserModel u)
+        public async Task<IActionResult> Step2(UserModel u)
         {
             if (ModelState.IsValidField("DateOfBirth") &&
                 ModelState.IsValidField("UniversityName") &&
@@ -88,41 +87,37 @@ namespace Kampus.Host.Controllers
 
                 return RedirectToAction("Step3");
             }
-            else
-            {
-                FillViewBag();
 
-                return View("Step2", _userModel);
-            }
+            await FillViewBag();
+
+            return View("Step2", _userModel);
         }
 
-        public ActionResult Step3()
+        public async Task<IActionResult> Step3()
         {
             return View(_userModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Step3(IFormFile file, string username)
+        public async Task<IActionResult> Step3(IFormFile file, string username)
         {
             if (!string.IsNullOrEmpty(username))
             {
-                if (_userService.ContainsUserWithSuchUsername(username))
+                if (await _userService.ContainsUserWithSuchUsername(username))
                     return View("Step3", _userModel);
 
                 _userModel.Username = username;
 
                 if (file != null)
                 {
-                    _userModel.Avatar = _fileService.SaveImage(HttpContext, file);
+                    _userModel.Avatar = await _fileService.SaveImage(HttpContext, file);
                 }
 
                 return RedirectToAction("Step4");
             }
-            else
-            {
-                return View("Step3", _userModel);
-            }
+
+            return View("Step3", _userModel);
         }
 
         public ActionResult Step4()
@@ -140,25 +135,23 @@ namespace Kampus.Host.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Index(UserModel u)
+        public async Task<IActionResult> Index(UserModel u)
         {
             if (ModelState.IsValid)
             {
                 _userService.RegisterUser(u);
                 return View("Success");
             }
-            else
-            {
-                FillViewBag();
 
-                return View(u);
-            }
+            await FillViewBag();
+
+            return View(u);
         }
 
         [HttpGet]
-        public string ContainsUserWithSuchUsername(string username)
+        public async Task<string> ContainsUserWithSuchUsername(string username)
         {
-            return _userService.ContainsUserWithSuchUsername(username) ? "contains" : "no";
+            return (await _userService.ContainsUserWithSuchUsername(username)) ? "contains" : "no";
         }
 
         [HttpGet]
@@ -168,21 +161,16 @@ namespace Kampus.Host.Controllers
         }
 
         [HttpGet]
-        public string GetUniversityFaculties(string name)
+        public async Task<IReadOnlyList<Faculty>> GetUniversityFaculties(string name)
         {
-            return _universityService.GetUniversityFaculties(name);
+            return await _universityService.GetUniversityFaculties(name);
         }
 
-        public void FillViewBag()
+        public async Task FillViewBag()
         {
-            List<CityModel> cities = _cityService.GetCities();
-            ViewBag.Cities = cities;
-
-            List<UniversityModel> universities = _universityService.GetUniversities();
-            ViewBag.Universities = universities;
-
-            List<UniversityFacultyModel> faculties = universities.ElementAt(0).Faculties;
-            ViewBag.Faculties = faculties;
+            ViewBag.Cities = await _cityService.GetCities();
+            ViewBag.Universities = await _universityService.GetUniversities();
+            ViewBag.Faculties = (ViewBag.Universities[0] as UniversityModel).Faculties;
         }
     }
 }

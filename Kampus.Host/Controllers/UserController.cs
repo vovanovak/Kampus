@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Kampus.Application.Exceptions;
 using Kampus.Application.Services;
 using Kampus.Application.Services.Users;
@@ -43,12 +44,12 @@ namespace Kampus.Host.Controllers
             _universityService = universityService;
         }
 
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var user = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
             HttpContext.Session.Add(SessionKeyConstants.UserProfile, user);
 
-            user.Posts = _wallPostService.GetAllPosts(user.Id);
+            user.Posts = await _wallPostService.GetAllPosts(user.Id);
             user.Friends = _userConnectionsService.GetUserFriends(user.Id);
             user.Subscribers = _userConnectionsService.GetUserSubscribers(user.Id);
 
@@ -58,7 +59,7 @@ namespace Kampus.Host.Controllers
             return View();
         }
 
-        public ActionResult Id(int id)
+        public async Task<IActionResult> Id(int id)
         {
             var user = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
             ViewBag.CurrentUser = user;
@@ -66,7 +67,7 @@ namespace Kampus.Host.Controllers
             try
             {
                 UserModel userProfile = _userService.GetById(id);
-                userProfile.Posts = _wallPostService.GetAllPosts(userProfile.Id);
+                userProfile.Posts = await _wallPostService.GetAllPosts(userProfile.Id);
                 userProfile.Friends = _userConnectionsService.GetUserFriends(userProfile.Id);
                 userProfile.Subscribers = _userConnectionsService.GetUserSubscribers(userProfile.Id);
 
@@ -84,29 +85,23 @@ namespace Kampus.Host.Controllers
 
         #region Global User Search
 
-        public ActionResult All()
+        public async Task<IActionResult> All()
         {
-            UserModel user = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
-            List<UserModel> users = _userService.GetAll().ToList();
+            var user = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
+            var users = _userService.GetAll().ToList();
 
             ViewBag.CurrentUser = user;
             ViewBag.Users = users;
-
-            List<CityModel> cities = _cityService.GetCities();
-            ViewBag.Cities = cities;
-
-            List<UniversityModel> universities = _universityService.GetUniversities();
-            ViewBag.Universities = universities;
-
-            List<UniversityFacultyModel> faculties = universities.ElementAt(0).Faculties;
-            ViewBag.Faculties = faculties;
+            ViewBag.Cities = await _cityService.GetCities();
+            ViewBag.Universities = await _universityService.GetUniversities();
+            ViewBag.Faculties = ViewBag.Universities.ElementAt(0).Faculties;
 
             ViewBag.UserSearch = _searchUser;
 
             return View();
         }
 
-        public ActionResult SearchUsers(string request, string university, string faculty, string city,
+        public async Task<IActionResult> SearchUsers(string request, string university, string faculty, string city,
             int? course, int? minage, int? maxage, int? minrating, int? maxrating)
         {
             List<UserModel> users = _userSearchService.SearchUsers(request, university, faculty, city,
@@ -121,15 +116,9 @@ namespace Kampus.Host.Controllers
 
             ViewBag.CurrentUser = user;
             ViewBag.Users = users;
-
-            List<CityModel> cities = _cityService.GetCities();
-            ViewBag.Cities = cities;
-
-            List<UniversityModel> universities = _universityService.GetUniversities();
-            ViewBag.Universities = universities;
-
-            List<UniversityFacultyModel> faculties = universities.ElementAt(0).Faculties;
-            ViewBag.Faculties = faculties;
+            ViewBag.Cities = await _cityService.GetCities();
+            ViewBag.Universities = await _universityService.GetUniversities();
+            ViewBag.Faculties = ViewBag.Universities.ElementAt(0).Faculties;
 
             return View("All");
         }

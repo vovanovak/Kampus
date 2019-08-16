@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Kampus.Application.Extensions;
 using Kampus.Application.Mappers;
 using Kampus.Models;
 using Kampus.Persistence.Contexts;
@@ -35,126 +37,111 @@ namespace Kampus.Application.Services.Impl
                 .Include(p => p.Attachments);
         }
 
-        public List<WallPostModel> GetAllPosts(int userId)
+        public async Task<IReadOnlyList<WallPostModel>> GetAllPosts(int userId)
         {
-            List<WallPostModel> models = GetAllPostsWithRelatedEntities()
+            var models = await GetAllPostsWithRelatedEntities()
                 .Where(p => p.OwnerId == userId)
                 .OrderByDescending(p => p.WallPostId)
-                .Select(_wallPostMapper.Map)
-                .ToList();
+                .Select(wp => _wallPostMapper.Map(wp))
+                .ToListAsync();
 
             return models;
         }
 
-        public IReadOnlyList<WallPostModel> GetLastWallPosts(int ownerId, int senderId, int lastPostId)
+        public async Task<IReadOnlyList<WallPostModel>> GetLastWallPosts(int ownerId, int senderId, int lastPostId)
         {
-            return GetAllPostsWithRelatedEntities()
+            return await GetAllPostsWithRelatedEntities()
                 .Where(p => p.OwnerId == ownerId && p.SenderId != senderId && p.WallPostId > lastPostId)
-                .Select(_wallPostMapper.Map)
-                .ToList();
+                .Select(wp => _wallPostMapper.Map(wp))
+                .ToListAsync();
         }
 
-        public IReadOnlyList<WallPostCommentModel> GetNewWallPostComments(int postId, int? postCommentId)
+        public async Task<IReadOnlyList<WallPostCommentModel>> GetNewWallPostComments(int postId, int? postCommentId)
         {
-            var post = _context.WallPosts.First(p => p.WallPostId == postId);
+            var post = await GetAllPostsWithRelatedEntities().SingleOrDefaultAsync(p => p.WallPostId == postId);
+
+            IReadOnlyList<WallPostComment> comments;
 
             if (postCommentId == null)
             {
-                try
-                {
-                    if (post.Comments.Any())
-                    {
-                        List<WallPostCommentModel> comments = post.Comments.Select(c => new WallPostCommentModel()
-                        {
-                            Id = c.WallPostId,
-                            CreationTime = c.CreationTime,
-                            Content = c.Content,
-                            WallPostId = c.WallPostId,
-                            Creator = new UserShortModel() { Id = c.Creator.UserId, Username = c.Creator.Username, Avatar = c.Creator.Avatar }
-                        }).ToList();
-
-                        return comments;
-                    }
-                    else
-                    {
-                        return new List<WallPostCommentModel>();
-                    }
-                }
-                catch (Exception e)
-                {
-                    return new List<WallPostCommentModel>();
-                }
+                comments = post.Comments;
             }
             else
             {
+                var comment = post.Comments.Single(c => c.WallPostCommentId == postCommentId);
 
-                var comment = post.Comments.First(c => c.WallPostCommentId == postCommentId);
-
-                List<WallPostComment> comments =
-                    post.Comments.Where(p => comment.CreationTime.Ticks < p.CreationTime.Ticks && comment.WallPostCommentId != p.WallPostCommentId).ToList();
-
-                if (comments.Any())
-                {
-                    return comments.Select(c => new WallPostCommentModel
-                    {
-                        Id = c.WallPostCommentId,
-                        CreationTime = c.CreationTime,
-                        Content = c.Content,
-                        WallPostId = c.WallPostId,
-                        Creator = new UserShortModel(c.Creator.UserId, c.Creator.Username, c.Creator.Avatar)
-                    }).ToList();
-                }
-
-                return new List<WallPostCommentModel>();
+                comments = post.Comments
+                    .Where(p => comment.CreationTime.Ticks < p.CreationTime.Ticks &&
+                                comment.WallPostCommentId != p.WallPostCommentId)
+                    .ToList();
             }
+
+            return comments.Select(MapToCommentModel).ToList();
         }
 
-        public LikeResult LikeWallPost(int userId, int postId)
+        private static WallPostCommentModel MapToCommentModel(WallPostComment c)
         {
-            var user = _context.Users.First(u => u.UserId == userId);
-
-            var post = _context.WallPosts.First(p => p.WallPostId == postId);
-
-            if (_context.WallPostLikes.Any(l => l.LikerId == user.UserId && l.WallPostId == postId))
+            return new WallPostCommentModel
             {
-                List<WallPostLike> likes =
-                    _context.WallPostLikes.Where(l => l.LikerId == user.UserId && l.WallPostId == postId).ToList();
+                Id = c.WallPostCommentId,
+                CreationTime = c.CreationTime,
+                Content = c.Content,
+                WallPostId = c.WallPostId,
+                Creator = c.Creator.MapToUserShortModel()
+            };
+        }
+
+        public async Task<LikeResult> LikeWallPost(int userId, int postId)
+        {
+            var user = await _context.Users.SingleAsync(u => u.UserId == userId);
+            var wallPost = await _context.WallPosts.SingleAsync(u => u.WallPostId == postId);
+            var hasWallPostLike = await _context.WallPostLikes.AnyAsync(l => l.LikerId == user.UserId && l.WallPostId == postId);
+
+            if (hasWallPostLike)
+            {
+                var likes = await _context.WallPostLikes
+                    .Where(l => l.LikerId == user.UserId && l.WallPostId == postId)
+                    .ToListAsync();
+
                 _context.WallPostLikes.RemoveRange(likes);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+
                 return LikeResult.Unliked;
             }
 
             var like = new WallPostLike
             {
-                WallPost = post,
-                WallPostId = post.WallPostId,
+                WallPost = wallPost,
+                WallPostId = wallPost.WallPostId,
                 Liker = user,
                 LikerId = user.UserId
             };
 
             _context.WallPostLikes.Add(like);
 
-            if (post.Owner.UserId != user.UserId)
+            if (wallPost.Owner.UserId != user.UserId)
             {
                 var notification = Notification.From(DateTime.Now, NotificationType.WallPostWritten,
-                    user, post.Owner, "@" + user.Username + " оцінив запис на вашій стіні", "/Home/Post/" + postId);
+                    user, wallPost.Owner, "@" + user.Username + " оцінив запис на вашій стіні", "/Home/Post/" + postId);
                 _context.Notifications.Add(notification);
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return LikeResult.Liked;
         }
 
-        public WallPostCommentModel WritePostComment(int userId, int postId, string text)
+        public async Task<WallPostCommentModel> WritePostComment(int userId, int postId, string text)
         {
-            WallPostComment comment = new WallPostComment();
+            var comment = new WallPostComment
+            {
+                Content = text,
+                WallPostId = postId,
+                WallPost = await _context.WallPosts.SingleAsync(p => p.WallPostId == postId),
+                Creator = await _context.Users.SingleAsync(u => u.UserId == userId),
+                CreationTime = DateTime.Now
+            };
 
-            comment.Content = text;
-            comment.WallPostId = postId;
-            comment.WallPost = _context.WallPosts.First(p => p.WallPostId == postId);
-            comment.Creator = _context.Users.First(u => u.UserId == userId);
-            comment.CreationTime = DateTime.Now;
 
             if (comment.WallPost.OwnerId != userId)
             {
@@ -164,9 +151,9 @@ namespace Kampus.Application.Services.Impl
             }
 
             _context.WallPostComments.Add(comment);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return _context.WallPostComments
+            return await _context.WallPostComments
                 .Where(c => c.WallPostId == postId && c.CreationTime == comment.CreationTime)
                 .Select(dbComment => new WallPostCommentModel
                 {
@@ -178,13 +165,13 @@ namespace Kampus.Application.Services.Impl
                         dbComment.Creator.Avatar)
                 })
                 .OrderByDescending(c => c.Id)
-                .First();
+                .FirstAsync();
         }
 
-        public WallPostModel WriteWallPost(int userId, int senderId, string content, List<FileModel> attachments)
+        public async Task<WallPostModel> WriteWallPost(int userId, int senderId, string content, List<FileModel> attachments)
         {
-            var sender = _context.Users.First(u => u.UserId == senderId);
-            var user = _context.Users.First(u => u.UserId == userId);
+            var sender = await _context.Users.SingleAsync(u => u.UserId == senderId);
+            var user = await _context.Users.SingleAsync(u => u.UserId == userId);
 
             if (attachments == null)
                 attachments = new List<FileModel>();
@@ -204,11 +191,9 @@ namespace Kampus.Application.Services.Impl
                 Likes = new List<UserShortModel>()
             };
 
-            var dbEntity = _wallPostMapper.Map(model);
+            var dbEntity = _wallPostMapper.Map(model, user.UserId, sender.UserId);
             _context.Files.AddRange(dbEntity.Attachments.Select(wf => wf.File));
             _context.WallPosts.Add(dbEntity);
-
-            _context.SaveChanges();
 
             if (userId != senderId)
             {
@@ -218,20 +203,20 @@ namespace Kampus.Application.Services.Impl
                 _context.Notifications.Add(notification);
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return model;
         }
 
-        public int GetLastWallPostId()
+        public async Task<int> GetLastWallPostId()
         {
-            return _context.WallPosts.Last().WallPostId;
+            return (await _context.WallPosts.LastAsync()).WallPostId;
         }
 
-        public void Delete(int wallPostId)
+        public async Task Delete(int wallPostId)
         {
-            var wallPost = _context.WallPosts.Single(p => p.WallPostId == wallPostId);
+            var wallPost = await _context.WallPosts.SingleAsync(p => p.WallPostId == wallPostId);
             _context.WallPosts.Remove(wallPost);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

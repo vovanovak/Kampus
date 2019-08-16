@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace Kampus.Host
 {
@@ -47,7 +48,14 @@ namespace Kampus.Host
                 options.Cookie.IsEssential = true;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services
+                .AddMvc()
+                .AddJsonOptions(mvcJsonOptions =>
+                {
+                    mvcJsonOptions.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                    mvcJsonOptions.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Ignore;
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

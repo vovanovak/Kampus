@@ -6,6 +6,6 @@ namespace Kampus.Application.Mappers
     public interface IWallPostMapper
     {
         WallPostModel Map(WallPost wallPost);
-        WallPost Map(WallPostModel wallPostModel);
+        WallPost Map(WallPostModel wallPostModel, int ownerId, int senderId);
     }
 }

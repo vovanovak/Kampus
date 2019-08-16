@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Kampus.Application.Exceptions;
 using Kampus.Application.Services;
 using Kampus.Application.Services.Users;
@@ -157,12 +158,12 @@ namespace Kampus.Host.Controllers
         }
 
         [HttpPost]
-        public void UploadFileTask()
+        public async Task UploadFileTask()
         {
             if (_attachmentsTask == null)
                 _attachmentsTask = new List<FileModel>();
 
-            _attachmentsTask.AddRange(_fileService.UploadFilesToServer(HttpContext));
+            _attachmentsTask.AddRange(await _fileService.UploadFilesToServer(HttpContext));
         }
 
         public ActionResult ViewTasks(int userId)
@@ -174,7 +175,7 @@ namespace Kampus.Host.Controllers
             UserModel sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
 
             profile.Tasks = _taskService.GetUserTasks(profile.Id)
-                .Where(t => !(t.Solved == true)).ToList();
+                .Where(t => t.Solved != true).ToList();
 
             ViewBag.CurrentUser = sender;
             ViewBag.UserProfile = profile;

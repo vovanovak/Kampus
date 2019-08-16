@@ -1,6 +1,7 @@
 ﻿using Kampus.Models;
 using Kampus.Persistence.Enums;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Kampus.Application.Services.Users
 {
@@ -8,10 +9,10 @@ namespace Kampus.Application.Services.Users
     {
         List<UserModel> GetAll();
         UserModel GetById(int userId);
-        UserModel GetByUsername(string username);
+        Task<UserModel> GetByUsername(string username);
         void RegisterUser(UserModel model);
-        SignInResult SignIn(string username, string password);
-        bool ContainsUserWithSuchUsername(string username);
+        Task<SignInResult> SignIn(string username, string password);
+        Task<bool> ContainsUserWithSuchUsername(string username);
         bool ContainsUserWithSuchEmail(string email);
         void SetAvatar(int userId, string path);
         void ChangePassword(int userId, string oldPassword, string newPassword, string newPasswordConfirm);
