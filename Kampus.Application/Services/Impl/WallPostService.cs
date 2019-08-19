@@ -34,7 +34,8 @@ namespace Kampus.Application.Services.Impl
                     .ThenInclude(l => l.Liker)
                 .Include(p => p.Comments)
                     .ThenInclude(c => c.Creator)
-                .Include(p => p.Attachments);
+                .Include(p => p.Attachments)
+                    .ThenInclude(wpf => wpf.File);
         }
 
         public async Task<IReadOnlyList<WallPostModel>> GetAllPosts(int userId)
@@ -214,8 +215,15 @@ namespace Kampus.Application.Services.Impl
 
         public async Task Delete(int wallPostId)
         {
-            var wallPost = await _context.WallPosts.SingleAsync(p => p.WallPostId == wallPostId);
-            _context.WallPosts.Remove(wallPost);
+            await _context.WallPostLikes.RemoveRangeAsync(wpl => wpl.WallPostId == wallPostId);
+            await _context.WallPostComments.RemoveRangeAsync(wpl => wpl.WallPostId == wallPostId);
+
+            var fileIds = await _context.WallPostFiles.Where(wpl => wpl.WallPostId == wallPostId).Select(wpf => wpf.FileId).ToListAsync();
+
+            await _context.WallPostFiles.RemoveRangeAsync(wpl => wpl.WallPostId == wallPostId);
+
+            await _context.WallPosts.RemoveAsync(w => w.WallPostId == wallPostId);
+
             await _context.SaveChangesAsync();
         }
     }

@@ -145,12 +145,11 @@ $(document).ready(function () {
         var likes = $(this);
         $.post('/WallPost/LikeWallPost', { postId: _postId }, function (data) {
             var count = parseInt(likes.children().first().text());
-            
-            if (data == 'Unliked')
+
+            if (data == 0)
                 likes.children().first().text(count - 1);
             else 
                 likes.children().first().text(count + 1);
-            
         });
     });
 

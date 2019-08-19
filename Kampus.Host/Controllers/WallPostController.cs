@@ -70,10 +70,10 @@ namespace Kampus.Host.Controllers
         }
 
         [HttpPost]
-        public async Task<LikeResult> LikeWallPost(int postId)
+        public async Task<IActionResult> LikeWallPost(int postId)
         {
             var sender = HttpContext.Session.Get<UserModel>(SessionKeyConstants.CurrentUser);
-            return await _wallPostService.LikeWallPost(sender.Id, postId);
+            return Json(await _wallPostService.LikeWallPost(sender.Id, postId));
         }
 
         [HttpPost]

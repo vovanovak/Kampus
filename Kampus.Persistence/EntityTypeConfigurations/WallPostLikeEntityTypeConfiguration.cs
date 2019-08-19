@@ -9,8 +9,8 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<WallPostLike> builder)
         {
             builder.HasKey(wpl => wpl.WallPostLikeId);
-            builder.HasOne(wpl => wpl.WallPost).WithMany().HasForeignKey(wpl => wpl.WallPostId);
-            builder.HasOne(wpl => wpl.Liker).WithMany().HasForeignKey(wpl => wpl.LikerId);
+            builder.HasOne(wpl => wpl.WallPost);
+            builder.HasOne(wpl => wpl.Liker);
         }
     }
 }

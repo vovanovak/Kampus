@@ -47,6 +47,12 @@ namespace Kampus.Host.Services.Impl
             return relativePath;
         }
 
+        // TODO: Implement the method
+        public Task RemoveFilesAsync(IReadOnlyCollection<int> fileIds)
+        {
+            return Task.CompletedTask;
+        }
+
         private async Task<FileModel> SaveFile(IFormFile file)
         {
             var fileName = Convert.ToString(DateTime.Now.Ticks) + file.FileName.Substring(file.FileName.LastIndexOf("."));

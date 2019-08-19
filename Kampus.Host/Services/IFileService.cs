@@ -10,5 +10,6 @@ namespace Kampus.Host.Services
         Task<byte[]> Download(string path);
         Task<IReadOnlyList<FileModel>> UploadFilesToServer(HttpContext context);
         Task<string> SaveImage(HttpContext context, IFormFile file);
+        Task RemoveFilesAsync(IReadOnlyCollection<int> fileIds);
     }
 }
