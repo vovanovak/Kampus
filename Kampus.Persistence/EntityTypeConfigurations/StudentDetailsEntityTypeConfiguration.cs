@@ -10,8 +10,8 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         {
             builder.ToTable("StudentDetails");
             builder.HasKey(sd => sd.StudentDetailsId);
-            builder.HasOne(b => b.University).WithMany().HasForeignKey(b => b.UniversityId);
-            builder.HasOne(b => b.Faculty).WithMany().HasForeignKey(b => b.FacultyId);
+            builder.HasOne(b => b.University);
+            builder.HasOne(b => b.Faculty);
         }
     }
 }

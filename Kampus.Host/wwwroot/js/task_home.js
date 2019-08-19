@@ -5,9 +5,8 @@
         var parent = $(this).parents(".taskexecutive");
         var postthis = $(this);
 
-        $.post('/Task/RemoveTaskExecutive', { taskId: _taskId }, function (data) {
-            console.log(data);
-            if (JSON.parse(data))
+        $.post('/Task/RemoveTaskExecutive', { taskId: _taskId }, function (response) {
+            if (response)
                 $(parent).remove(); 
         });
     });
@@ -27,8 +26,7 @@
     $(document.body).on('click', '.tasksolve', function () {
         var val1 = $(this).parents(".task").find('.taskid')[0].value;
         var postthis = $(this);
-        $.post('/Task/CheckTaskAsSolved', { taskid: val1 }, function (data) {
-            var val = JSON.parse(data);
+        $.post('/Task/CheckTaskAsSolved', { taskid: val1 }, function (val) {
             postthis.find('img').attr("src", "/Images/solved.png");
 
             if (val.Id != -1) {
@@ -44,13 +42,11 @@
         var div = $(this).parents(".taskcommentshid");
         var subscribers = $(div).children(".tasksubscribers");
         var postthis = $(this);
-        $.post('/Task/CheckAsTaskMainExecutive', { taskid: _taskid, username: _username }, function (data) {
+        $.post('/Task/CheckAsTaskMainExecutive', { taskid: _taskid, username: _username }, function (val) {
             if ($(parent).children('.tasksubscriber').length < 2)
                 $(parent).parent().parent().remove();
             else
                 $(parent).remove();
-
-            var val = JSON.parse(data);
             
             koViewModel.addTaskExecutive({ Id: _taskid, Executive: val });
         });
@@ -117,8 +113,7 @@
             category: _category,
             subcategory: _subcategory
         },
-        function (json) {
-            var data = JSON.parse(json);
+        function (data) {
             console.log(data);
             koViewModel.addChild(data);
             koViewModel.clearAttachments();

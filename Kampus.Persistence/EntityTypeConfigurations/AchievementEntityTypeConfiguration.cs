@@ -10,7 +10,7 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         {
             builder.HasKey(a => a.AchievementId);
             builder.HasOne(a => a.User).WithMany(u => u.Achievements).HasForeignKey(a => a.AchievementId);
-            builder.HasOne(a => a.TaskCategory).WithMany().HasForeignKey(a => a.TaskCategoryId);
+            builder.HasOne(a => a.TaskCategory);
         }
     }
 }

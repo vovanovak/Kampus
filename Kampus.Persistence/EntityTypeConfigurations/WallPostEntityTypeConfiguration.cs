@@ -9,8 +9,8 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<WallPost> builder)
         {
             builder.HasKey(wp => wp.WallPostId);
-            builder.HasOne(w => w.Owner); //.WithMany().HasForeignKey(w => w.OwnerId);
-            builder.HasOne(w => w.Sender); //.WithMany().HasForeignKey(w => w.SenderId);
+            builder.HasOne(w => w.Owner);
+            builder.HasOne(w => w.Sender);
         }
     }
 }

@@ -97,9 +97,10 @@ function getKnockoutTemplates() {
 
 function setNewSubcategories(self, selector) {
     var nameParam = $(self).find("option:selected").first().text();
-    
-    $.get('/Task/GetSubcategories', { name: nameParam }).done((data, htmlSubcats) => {
-        var list = JSON.parse(data);
+
+    $.get('/Task/GetSubcategories', { name: nameParam })
+        .done((list, htmlSubcats) =>
+    {
         var htmlSubcats = '<option value=""></option>';
         for (var i = 0; i < list.length; i++) {
            htmlSubcats += '<option value="' + list[i].Id + '">' + list[i].Name + '</option>';
@@ -141,22 +142,21 @@ function taskIndexInit() {
         var _count = $(this).parents('.task').find('.taskcount')[0];
         var postthis = $(this);
 
-        $.post('/Task/WriteTaskComment', { taskId: _taskId, text: _text }, function (data) {
-            console.log({ Id: _taskId, Comments: JSON.parse(data) });
+        $.post('/Task/WriteTaskComment', { taskId: _taskId, text: _text }, function (response) {
+            console.log({ Id: _taskId, Comments: response });
 
             for (var i = 0; i < koViewModel.newTasks.length; i++) {
                 if (koViewModel.newTasks[i].Id == _taskId) {
-                    koViewModel.newTasks[i].Comments.splice(koViewModel.newTasks[i].Comments.length - 1, 0, JSON.parse(data));
+                    koViewModel.newTasks[i].Comments.splice(koViewModel.newTasks[i].Comments.length - 1, 0, response);
                 }
             }
 
-            koViewModel.addNewTaskComment({ Id: _taskId, Comments: JSON.parse(data) });
+            koViewModel.addNewTaskComment({ Id: _taskId, Comments: response });
 
             var value = parseInt($(_count).text());
 
             $(_count).text(value + 1);
             $(_text).text('');
-
         });
     });
 
@@ -174,9 +174,7 @@ function taskIndexInit() {
             var _postid = postthis.parents('.task').find('.taskid').val();
             var _postcommentid = postthis.parents('.task').find('.taskcommentid:last').val();
 
-            $.get('/Task/GetNewTaskComments', { taskId: _postid, taskCommentId: _postcommentid }).done(function (data) {
-                var list = JSON.parse(data);
-
+            $.get('/Task/GetNewTaskComments', { taskId: _postid, taskCommentId: _postcommentid }).done(function (list) {
                 if (list.length > 0) {
                     for (var i = 0; i < list.length; i++) {
                         koViewModel.addNewTaskComment({ Id: _postid, Comments: list[i] });
@@ -198,8 +196,7 @@ function taskIndexInit() {
         var postthis = $(this);
         if (!isNaN(str) || !str.localeCompare("")) {
 
-            $.post('/Task/SubscribeOnTask', { taskId: _taskid, taskPrice: str }, function (data) {
-                var val = JSON.parse(data);
+            $.post('/Task/SubscribeOnTask', { taskId: _taskid, taskPrice: str }, function (val) {
                 if (val.Id == -1) {
                     alert("Ви не можете підписатись на це завдання");
                 }

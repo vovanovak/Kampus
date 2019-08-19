@@ -9,8 +9,8 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<TaskExecutionReview> builder)
         {
             builder.HasKey(ter => ter.TaskExecutionReviewId);
-            builder.HasOne(ter => ter.Executor).WithMany().HasForeignKey(ter => ter.ExecutorId);
-            builder.HasOne(ter => ter.Task).WithMany().HasForeignKey(ter => ter.TaskId);
+            builder.HasOne(ter => ter.Executor);
+            builder.HasOne(ter => ter.Task);
         }
     }
 }

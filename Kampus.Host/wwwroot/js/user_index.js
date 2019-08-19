@@ -11,11 +11,11 @@ $(document).ready(function () {
         this.attachmentsImages = ko.observableArray(images);
 
         this.getWallpostComments = function(Id){
-            return ko.utils.arrayFilter(koViewModel.newWallpostComments(), function (item) { return item.Id === Id }).Comments;
+            return ko.utils.arrayFilter(koViewModel.newWallpostComments(), function (item) { return item.Id === Id }).comments;
         }
 
         this.addWallpost = function (wallpost) {
-            wallpost.Comments = ko.observableArray(ko.Comments);
+            wallpost.comments = ko.observableArray(ko.comments);
             self.newWallposts().unshift(wallpost);
             self.newWallposts.valueHasMutated();
         };
@@ -32,10 +32,10 @@ $(document).ready(function () {
             var found = false;
 
             for (var i = 0; i < self.newWallposts().length; i++) {
-                if (self.newWallposts()[i].Id == comment.WallPostId) {
+                if (self.newWallposts()[i].Id == comment.wallPostId) {
                     found = true;
 
-                    self.newWallposts()[i].Comments.push(comment);
+                    self.newWallposts()[i].comments.push(comment);
 
                     $(".postid[value='" + self.newWallposts()[i].Id + "']").parents('.post')
                         .find('.postcommentshid').css({ display: "block" });
@@ -61,25 +61,25 @@ $(document).ready(function () {
 
     notifications_init();
 
-    $.ajax('/Templates/wallpost.html', { async: false })
+    $.get('/templates/wallpost.html', { async: false })
         .success(function (stream) {
             $('#templateWallpost').html(stream);
         }
     );
 
-    $.ajax('/Templates/wallpost_comment.html', { async: false })
+    $.get('/templates/wallpost_comment.html', { async: false })
         .success(function (stream) {
             $('#templateWallpostComment').html(stream);
         }
     );
 
-    $.ajax('/Templates/attachment_file.html', { async: false })
+    $.get('/templates/attachment_file.html', { async: false })
        .success(function (stream) {
            $('#templateAttachments').html(stream);
        }
    );
 
-    $.ajax('/Templates/attachment_image.html', { async: false })
+    $.get('/templates/attachment_image.html', { async: false })
       .success(function (stream) {
           $('#templateImages').html(stream);
       }
@@ -92,8 +92,7 @@ $(document).ready(function () {
     });
 
     $('#addsubscriber').click(function () {
-        $.post('/User/AddSubscriber', {}, function (data) {
-            var result = JSON.parse(data);
+        $.post('/User/AddSubscriber', {}, function (result) {
             if (result == true)
                 alert("Ви успішно підписались на користувача @@" + profileUsername);
             else
@@ -124,9 +123,7 @@ $(document).ready(function () {
             var _postId = comments.parents('.post').find('.postid').val();
             var _postCommentId = comments.parents('.post').find('.postcommentid:last').val();
 
-            $.get('/WallPost/GetNewWallPostComments', { postId: _postId, postCommentId: _postCommentId }).done(function (data) {
-                var list = JSON.parse(data);
-
+            $.get('/WallPost/GetNewWallPostComments', { postId: _postId, postCommentId: _postCommentId }).done(function (list) {
                 if (list.length > 0) {
                     for (var i = 0; i < list.length; i++) {
                         koViewModel.addNewWallPostComment(list[i]);
@@ -159,8 +156,8 @@ $(document).ready(function () {
 
         console.log(_postid);
 
-        $.post('/WallPost/DeleteWallpost', { postId: _postid }, function (res) {
-            var result = JSON.parse(res).Result;
+        $.post('/WallPost/DeleteWallpost', { postId: _postid }, function (response) {
+            var result = response.result;
             if (result) {    
                 _post.remove();
             }
@@ -172,8 +169,8 @@ $(document).ready(function () {
         var _text = $(this).parent().children('.maininputcommentinput').val();
         var _count = $(this).parents('.post').find('.postcount')[0];
        
-        $.post('/WallPost/WritePostComment', { postId: _postId, text: _text }, function (data) {
-            koViewModel.addNewWallPostComment(JSON.parse(data));
+        $.post('/WallPost/WritePostComment', { postId: _postId, text: _text }, function (response) {
+            koViewModel.addNewWallPostComment(response);
 
             var value = parseInt($(_count).text());
 
@@ -203,14 +200,14 @@ $(document).ready(function () {
 
                 if (extension.localeCompare('.jpg') == 0 || extension.localeCompare('.png') == 0) {
                     koViewModel.addNewAttachImage({
-                        FileName: files[files.length - 1].name,
-                        Path: URL.createObjectURL(files[files.length - 1]).toLocaleString()
+                        fileName: files[files.length - 1].name,
+                        path: URL.createObjectURL(files[files.length - 1]).toLocaleString()
                     });
                 }
                 else {
                     koViewModel.addNewAttachment({
-                        FileName: files[files.length - 1].name,
-                        Path: URL.createObjectURL(files[files.length - 1]).toLocaleString()
+                        fileName: files[files.length - 1].name,
+                        path: URL.createObjectURL(files[files.length - 1]).toLocaleString()
                     });
                 }
             },
@@ -222,9 +219,7 @@ $(document).ready(function () {
     });
     $(document.body).on('click', '#maininputmsgcontentsend', function () {
         var _text = $('#maininputmsgcontentinput').val();
-        $.post('/WallPost/WriteWallPost', { text: _text }, function (json) {
-            var data = JSON.parse(json);
-            
+        $.post('/WallPost/WriteWallPost', { text: _text }, function (data) {
             koViewModel.addWallpost(data);
 
             koViewModel.clearAttachments();
@@ -245,9 +240,7 @@ $(document).ready(function () {
         if (_postId == undefined)
             _postId = -1;
 
-        $.get('/WallPost/GetNewWallPosts', { lastPostId: _postId }).done(function (data) {
-            var wallPosts = JSON.parse(data);
-
+        $.get('/WallPost/GetNewWallPosts', { lastPostId: _postId }).done(function (wallPosts) {
             for (var i = 0; i < wallPosts.length; i++) {
                 koViewModel.addWallpost(wallPosts[i]);
             }

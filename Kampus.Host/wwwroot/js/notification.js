@@ -1,8 +1,6 @@
 ﻿function notifications_init() {
     setInterval(function () {
-        $.get('/Notification/GetNewNotifications').done(function (data) {
-            var list = JSON.parse(data);
-
+        $.get('/Notification/GetNewNotifications').done(function (list) {
             if ($('.notificationicon').attr('src').localeCompare('/Images/toolbar/not_new.png') != 0)
                 $(".notifications").children().remove();
 

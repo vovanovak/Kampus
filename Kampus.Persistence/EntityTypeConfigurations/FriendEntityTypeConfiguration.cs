@@ -9,8 +9,8 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<Friend> builder)
         {
             builder.HasKey(f => f.FriendId);
-            builder.HasOne(b => b.User1).WithMany().HasForeignKey(b => b.User1Id);
-            builder.HasOne(b => b.User2).WithMany().HasForeignKey(b => b.User2Id);
+            builder.HasOne(b => b.User1);
+            builder.HasOne(b => b.User2);
         }
     }
 }

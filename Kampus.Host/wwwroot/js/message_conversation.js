@@ -123,9 +123,7 @@ $(document).ready(function () {
         var _receiver = $('#receiverid').val();
         var _text = $('.maininputmsgcontentinput').val();
 
-        $.post('/Message/WriteMessage', { receiverId: _receiver, text: _text }, function (json) {
-            var data = JSON.parse(json);
-
+        $.post('/Message/WriteMessage', { receiverId: _receiver, text: _text }, function (data) {
             console.log(data);
 
             koViewModel.addMessage(data);
@@ -156,9 +154,7 @@ $(document).ready(function () {
                 senderId: sender,
                 receiverId: receiver,
                 lastMsgId: lstmsgid
-            }).done(function (json) {
-                var data = JSON.parse(json);
-
+            }).done(function (data) {
                 for (var i = 0; i < data.length; i++) {
                     if (lstmsgid != data[i].Id) {
                         koViewModel.addMessage(data[i]);

@@ -9,10 +9,10 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(ts => ts.UserId);
-            builder.HasOne(u => u.StudentDetails).WithMany().HasForeignKey(u => u.StudentDetailsId);
-            builder.HasOne(u => u.Role).WithMany().HasForeignKey(u => u.RoleId);
-            builder.HasOne(u => u.City).WithMany().HasForeignKey(u => u.CityId);
-            builder.HasOne(u => u.UserPermissions).WithMany().HasForeignKey(u => u.UserPermissionsId);
+            builder.HasOne(u => u.StudentDetails);
+            builder.HasOne(u => u.Role);
+            builder.HasOne(u => u.City);
+            builder.HasOne(u => u.UserPermissions);
         }
     }
 }

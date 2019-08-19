@@ -10,7 +10,7 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         {
             builder.HasKey(tc => tc.TaskCommentId);
             builder.HasOne(tc => tc.TaskEntry).WithMany(t => t.TaskComments).HasForeignKey(tc => tc.TaskId);
-            builder.HasOne(tc => tc.Creator).WithMany().HasForeignKey(tc => tc.CreatorId);
+            builder.HasOne(tc => tc.Creator);
         }
     }
 }

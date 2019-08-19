@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Kampus.Application.Extensions;
+using Kampus.Host.Services;
 using Kampus.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
-namespace Kampus.Host.Services.Impl
+namespace Kampus.Application.Services.Impl
 {
     internal class FileService : IFileService
     {
@@ -82,7 +82,7 @@ namespace Kampus.Host.Services.Impl
         public async Task<byte[]> Download(string path)
         {
             var absolutePath = _hostingEnvironment.WebRootPath + "/Files/" + path;
-            return await System.IO.File.ReadAllBytesAsync(absolutePath);
+            return System.IO.File.ReadAllBytes(absolutePath);
         }
     }
 }

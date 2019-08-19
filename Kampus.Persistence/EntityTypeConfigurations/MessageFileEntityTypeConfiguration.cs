@@ -10,7 +10,7 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         {
             builder.HasKey(mf => mf.MessageFileId);
             builder.HasOne(mf => mf.File);
-            builder.HasOne(mf => mf.Message).WithMany(m => m.Attachments);
+            builder.HasOne(mf => mf.Message);
         }
     }
 }

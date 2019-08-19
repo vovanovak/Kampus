@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Kampus.Application;
 using Kampus.Host.Services;
-using Kampus.Host.Services.Impl;
 using Kampus.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,8 +33,6 @@ namespace Kampus.Host
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-            services.AddScoped<IFileService, FileService>();
 
             services
                 .AddApplicationDependencies()

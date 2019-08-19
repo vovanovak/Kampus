@@ -9,8 +9,8 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<Notification> builder)
         {
             builder.HasKey(n => n.NotificationId);
-            builder.HasOne(n => n.Sender).WithMany().HasForeignKey(n => n.SenderId);
-            builder.HasOne(n => n.Receiver).WithMany().HasForeignKey(n => n.ReceiverId);
+            builder.HasOne(n => n.Sender);
+            builder.HasOne(n => n.Receiver);
         }
     }
 }

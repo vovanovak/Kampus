@@ -11,10 +11,10 @@ namespace Kampus.Persistence.EntityTypeConfigurations
             builder.ToTable("Tasks");
 
             builder.HasKey(t => t.TaskId);
-            builder.HasOne(t => t.TaskCategory).WithMany().HasForeignKey(t => t.TaskCategoryId);
-            builder.HasOne(t => t.TaskSubcategory).WithMany().HasForeignKey(t => t.TaskSubcategoryId);
-            builder.HasOne(t => t.Creator).WithMany().HasForeignKey(t => t.CreatorId);
-            builder.HasOne(t => t.Executive).WithMany().HasForeignKey(t => t.ExecutiveId);
+            builder.HasOne(t => t.TaskCategory);
+            builder.HasOne(t => t.TaskSubcategory);
+            builder.HasOne(t => t.Creator);
+            builder.HasOne(t => t.Executive);
         }
     }
 }

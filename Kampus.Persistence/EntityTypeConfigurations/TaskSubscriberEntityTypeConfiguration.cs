@@ -9,7 +9,7 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<TaskSubscriber> builder)
         {
             builder.HasKey(ts => ts.TaskSubscriberId);
-            builder.HasOne(ts => ts.Subscriber).WithMany().HasForeignKey(ts => ts.TaskSubscriberId);
+            builder.HasOne(ts => ts.Subscriber);
             builder.HasOne(ts => ts.TaskEntry).WithMany(t => t.TaskSubscribers).HasForeignKey(ts => ts.TaskId);
         }
     }

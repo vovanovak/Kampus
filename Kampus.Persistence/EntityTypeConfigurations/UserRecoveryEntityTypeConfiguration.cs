@@ -9,7 +9,7 @@ namespace Kampus.Persistence.EntityTypeConfigurations
         public void Configure(EntityTypeBuilder<UserRecovery> builder)
         {
             builder.HasKey(ur => ur.UserRecoveryId);
-            builder.HasOne(b => b.User).WithMany().HasForeignKey(b => b.UserId);
+            builder.HasOne(b => b.User);
         }
     }
 }

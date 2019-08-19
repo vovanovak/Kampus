@@ -4,6 +4,7 @@ using Kampus.Application.Services;
 using Kampus.Application.Services.Impl;
 using Kampus.Application.Services.Users;
 using Kampus.Application.Services.Users.Impl;
+using Kampus.Host.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kampus.Application
@@ -27,6 +28,7 @@ namespace Kampus.Application
             services.AddScoped<ITaskService, TaskService>();
             services.AddScoped<IUniversityService, UniversityService>();
             services.AddScoped<IWallPostService, WallPostService>();
+            services.AddScoped<IFileService, FileService>();
 
             return services;
         }
